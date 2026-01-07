@@ -50,6 +50,7 @@
                 <label asp-for="Status" class="control-label"></label>
                 <select asp-for="Status" class="form-control"
                         asp-items="Html.GetEnumSelectList<GerenciadorAtivos.Models.StatusAtivo>()">
+                    <option value="">Selecione uma opção...</option>
                 </select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>

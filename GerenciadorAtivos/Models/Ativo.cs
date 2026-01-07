@@ -32,7 +32,7 @@ namespace GerenciadorAtivos.Models
         public string Setor { get; set; }
 
         [Required(ErrorMessage = "Defina o status inicial.")]
-        public StatusAtivo Status { get; set; } = StatusAtivo.Disponivel;
+        public StatusAtivo? Status { get; set; }
     }
 
     public enum TipoAtivo { Notebook, Desktop, Monitor, Periferico, Servidor }
