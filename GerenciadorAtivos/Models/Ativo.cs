@@ -36,5 +36,16 @@ namespace GerenciadorAtivos.Models
     }
 
     public enum TipoAtivo { Notebook, Desktop, Monitor, Periferico, Servidor }
-    public enum StatusAtivo { Disponivel, EmUso, Manutencao, Descartado }
+    public enum StatusAtivo
+    {
+        Disponivel,
+
+        [Display(Name = "Em Uso")] // Isso faz a mágica visual
+        EmUso,
+
+        [Display(Name = "Em Manutenção")] // Aproveitando para arrumar esse também
+        Manutencao,
+
+        Descartado
+    }
 }
