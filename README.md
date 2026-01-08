@@ -1,31 +1,63 @@
-# Sistema de Gerenciamento de Ativos de TI 
+# TechAsset Manager
 
-Este projeto é uma aplicação web desenvolvida para simular um ambiente corporativo real de controle de inventário de TI (Hardware/Software).
+Sistema corporativo para gerenciamento e controle de inventário de ativos de TI (Hardware e Periféricos). Desenvolvido como projeto de portfólio focando em boas práticas de Engenharia de Software com .NET.
 
-O objetivo é demonstrar competências em desenvolvimento Fullstack com foco no ecossistema .NET, aplicando boas práticas de arquitetura e modelagem de dados.
+![Badge](https://img.shields.io/badge/Status-Versao%201.0%20%28Estavel%29-blue) ![.NET](https://img.shields.io/badge/.NET-ASP.NET_Core-purple)
+
+
+## Screenshots
+
+### Dashboard Gerencial
+Visão geral com indicadores de status em tempo real.
+<img width="1849" height="914" alt="Image" src="https://github.com/user-attachments/assets/7fe8fd6f-6e5e-4718-b8a3-4f17e12fabdc" />
+
+### Listagem de Ativos
+Controle de inventário com indicadores visuais de status.
+<img width="1850" height="914" alt="Image" src="https://github.com/user-attachments/assets/8a2fac6f-0c7c-4e93-8133-31131ecdba72" />
+
+### Cadastro e Validação
+Formulários com validação de dados e feedback visual em Português.
+<img width="1832" height="917" alt="Image" src="https://github.com/user-attachments/assets/ee6fb507-cd1d-450a-9583-b9563f7f5edc" />
+
+---
+
+## Funcionalidades
+
+### Versão 1.0 (MVP)
+- [x] **CRUD Completo:** Criação, Leitura, Atualização e Exclusão de ativos.
+- [x] **Dashboard Interativo:** Página inicial com contadores de equipamentos (Total, Em Uso, Disponíveis, Manutenção).
+- [x] **Validação de Dados:** Regras de negócio aplicadas no Back-end com *Data Annotations* e mensagens de erro amigáveis em PT-BR.
+- [x] **Identidade Visual Corporativa:** Layout customizado (Azul Royal), responsivo e profissional.
+- [x] **Tipagem Forte:** Uso de *Enums* para evitar erros de digitação em Status e Tipos de equipamento.
+- [x] **Data Seeding:** População automática do banco de dados para testes iniciais.
+
+---
 
 ## Tecnologias Utilizadas
 
-* **Back-end:** C# com .NET 10 (LTS) / ASP.NET Core MVC
-* **Banco de Dados:** SQL Server / Entity Framework Core (Code-First)
-* **Front-end:** Razor Views, HTML5, CSS3, Bootstrap
-* **Ferramentas:** Visual Studio 2026 Community, Git
-
-## Funcionalidades Atuais
-
-- [x] Cadastro de Ativos (CRUD Completo)
-- [x] Validação de dados (Data Annotations)
-- [x] Uso de Enums para tipagem forte (Status e Tipo de Ativo)
-- [ ] Dashboard com indicadores (Em desenvolvimento)
-- [ ] Login e Autenticação (Planejado)
-
-## Como rodar o projeto
-
-1. Clone o repositório
-2. Abra a solução no Visual Studio 2026
-3. Atualize a ConnectionString no `appsettings.json` (se necessário)
-4. Rode o comando `Update-Database` no Console do Gerenciador de Pacotes para criar o banco local
-5. Execute o projeto (F5)
+- **Linguagem:** C#
+- **Framework:** ASP.NET Core MVC (.NET 10 Preview – projeto de estudo)
+- **Banco de Dados:** SQL Server (LocalDB)
+- **ORM:** Entity Framework Core (Code-First)
+- **Front-end:** Razor Views, Bootstrap 5, CSS Customizado
+- **Controle de Versão:** Git & GitHub
 
 ---
-*Desenvolvido por Pedro Henrique como parte de portfólio prático de evolução técnica.*
+
+## Como Rodar o Projeto
+
+1. **Clone o repositório:**
+
+```bash
+git clone https://github.com/drexsi0/TechAssetManager.git
+```
+
+2. **Configure o Banco de Dados:**
+Certifique-se de ter o SQL Server (LocalDB) instalado (padrão no Visual Studio). O Entity Framework irá criar o banco automaticamente na primeira execução graças ao `EnsureCreated`.
+
+3. **Execute a Aplicação:**
+Abra a solução no Visual Studio e pressione `F5`.
+
+---
+
+Desenvolvido por **Pedro Henrique**, como parte de estudos avançados em Desenvolvimento Fullstack .NET.
