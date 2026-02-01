@@ -51,12 +51,8 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account.Manage
         /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Phone]
-            [Display(Name = "Phone number")]
+            [Phone(ErrorMessage = "O número de telefone não é válido.")]
+            [Display(Name = "Número de telefone")]
             public string PhoneNumber { get; set; }
         }
 

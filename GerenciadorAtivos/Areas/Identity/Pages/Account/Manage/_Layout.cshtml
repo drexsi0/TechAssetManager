@@ -1,7 +1,7 @@
 ﻿@{
-    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayoutObj) && parentLayoutObj is string parentLayoutStr && parentLayoutStr is not null)
     {
-        Layout = parentLayout.ToString();
+        Layout = parentLayoutStr;
     }
     else
     {
@@ -9,10 +9,10 @@
     }
 }
 
-<h1>Manage your account</h1>
+<h1>Gerenciar sua conta</h1>
 
 <div>
-    <h2>Change your account settings</h2>
+    <h2>Alterar suas configurações de conta</h2>
     <hr />
     <div class="row">
         <div class="col-md-3">

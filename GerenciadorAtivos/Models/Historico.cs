@@ -15,7 +15,7 @@ namespace GerenciadorAtivos.Models
 
         // Propriedade de Navegação (para o Entity Framework entender o link)
         [ForeignKey("AtivoId")]
-        public virtual Ativo Ativo { get; set; }
+        public virtual Ativo? Ativo { get; set; }
 
         [Required]
         [Display(Name = "Data da Ação")]
@@ -23,10 +23,10 @@ namespace GerenciadorAtivos.Models
 
         [Required]
         [Display(Name = "Tipo de Ação")]
-        public string TipoAcao { get; set; } // Ex: "Criação", "Atualização", "Exclusão"
+        public string TipoAcao { get; set; } = string.Empty; // Ex: "Criação", "Atualização", "Exclusão"
 
         [Display(Name = "Descrição")]
-        public string Descricao { get; set; } // Ex: "Mudou status de Disponível para Em Uso"
+        public string Descricao { get; set; } = string.Empty; // Ex: "Mudou status de Disponível para Em Uso"
 
         public string? Usuario { get; set; }
     }
