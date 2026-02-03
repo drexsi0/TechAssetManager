@@ -24,11 +24,19 @@
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Início</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Historico" asp-action="Index">Auditoria</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Ativos" asp-action="Index">
+                                <i class="bi bi-box-seam-fill"></i> Inventário
+                            </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Relatorios" asp-action="Index">Relatórios</a>
-                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Historico" asp-action="Index">Auditoria</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Relatorios" asp-action="Index">Relatórios</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
                         </li>

@@ -54,8 +54,11 @@
                     <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados" aria-expanded="false">
                         <i class="bi bi-funnel"></i> Filtros Avançados ▼
                     </button>
-                    <a asp-action="Create" class="btn btn-success ms-2"> Novo Ativo</a>
-                </div>
+                    @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Create" class="btn btn-success ms-2"> Novo Ativo</a>
+                        }
+                    </div>
             </div>
 
             <div class="collapse mt-3 @((ViewData["StatusFilter"] != null || ViewData["SetorFilter"] != null || ViewData["TipoFilter"] != null) ? "show" : "")" id="filtrosAvancados">
@@ -127,9 +130,15 @@
                 </td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-secondary">Editar</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-secondary">Editar</a>
+                        }
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info">Ver</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Excluir</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Excluir</a>
+                        }
                     </div>
                 </td>
             </tr>

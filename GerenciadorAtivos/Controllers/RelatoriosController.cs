@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GerenciadorAtivos.Controllers
 {
-    [Authorize] // Só logado baixa relatório
+    [Authorize(Roles = "Admin")]
     public class RelatoriosController : Controller
     {
         private readonly ApplicationDbContext _context;

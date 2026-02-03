@@ -90,6 +90,9 @@ else
 }
 
 <div class="mt-4">
-    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Editar</a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Editar</a>
+    }
     <a asp-action="Index" class="btn btn-outline-secondary ms-2">Voltar para Lista</a>
 </div>
