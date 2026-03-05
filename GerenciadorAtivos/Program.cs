@@ -4,23 +4,70 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// --- CONFIGURAÇÃO DE BANCO DE DADOS (HÍBRIDO: LOCAL vs NUVEM) ---
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    // ESTAMOS NA NUVEM -> USAR POSTGRES
+    try
+    {
+        var databaseUri = new Uri(databaseUrl);
+        var userInfo = databaseUri.UserInfo.Split(':');
 
-// Adicionando suporte a Roles (Perfis) além do usuário padrão
+        var pgConnectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(pgConnectionString));
+
+        Console.WriteLine("--> Usando Banco Postgres (Nuvem)");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Erro ao configurar Postgres: {ex.Message}");
+    }
+}
+else
+{
+    // ESTAMOS LOCAL -> USAR SQL SERVER
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(connectionString));
+
+    Console.WriteLine("--> Usando SQL Server (Local)");
+}
+// -----------------------------------------------------------
+
+// 👇 CORREÇÃO: Restaurando as configurações do Identity (Login e Roles) e MVC
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>() // <--- ESSA É A LINHA MÁGICA
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddControllersWithViews();
+// 👆 FIM DA CORREÇÃO
 
 var app = builder.Build();
 
-// --- INICIO DO SEED DATA ---
+// --- MIGRAÇÃO AUTOMÁTICA (CRIA O BANCO NA NUVEM) ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+
+    // Se tiver mudanças pendentes no banco, aplica agora!
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}
+// ---------------------------------------------------
+
+// --- INÍCIO DOS SEEDS (Popula o banco inicialmente) ---
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    // 1. Seed de Ativos e Históricos Iniciais
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
@@ -29,10 +76,21 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Um erro ocorreu ao popular o banco de dados.");
+        logger.LogError(ex, "Um erro ocorreu ao popular o banco de dados com ativos.");
+    }
+
+    // 2. Seed de Perfis (Roles) e Usuário Admin
+    try
+    {
+        await GerenciadorAtivos.Data.SeedData.Initialize(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Um erro ocorreu ao criar os perfis de usuário.");
     }
 }
-// --- FIM DO SEED DATA ---
+// ---------------------------------------------------
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -44,6 +102,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// 👇 CORREÇÃO: Authentication DEVE vir antes do Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -53,25 +113,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// AJUSTE 2: Obrigatório para o Login funcionar
+// Obrigatório para as telas de Login/Registro funcionarem
 app.MapRazorPages();
-
-// ... códigos anteriores (app.MapRazorPages, etc)
-
-// --- BLOCO DE INICIALIZAÇÃO DE DADOS (SEED) ---
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        await GerenciadorAtivos.Data.SeedData.Initialize(services);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Um erro ocorreu ao criar os perfis de usuário.");
-    }
-}
-// ----------------------------------------------
 
 app.Run();
