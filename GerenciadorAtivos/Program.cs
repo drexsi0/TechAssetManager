@@ -12,10 +12,24 @@ if (!string.IsNullOrEmpty(databaseUrl))
     // ESTAMOS NA NUVEM -> USAR POSTGRES
     try
     {
-        var databaseUri = new Uri(databaseUrl);
-        var userInfo = databaseUri.UserInfo.Split(':');
+        string pgConnectionString;
 
-        var pgConnectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+        // Verifica se a URL está no formato de link (postgres://)
+        if (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://"))
+        {
+            var databaseUri = new Uri(databaseUrl);
+            var userInfo = databaseUri.UserInfo.Split(':');
+
+            // O PULO DO GATO: Se a porta não vier na URL, força a padrão (5432)
+            var port = databaseUri.Port > 0 ? databaseUri.Port : 5432;
+
+            pgConnectionString = $"Server={databaseUri.Host};Port={port};Database={databaseUri.AbsolutePath.TrimStart('/')};User Id={userInfo[0]};Password={userInfo[1]};SslMode=Require;Trust Server Certificate=true";
+        }
+        else
+        {
+            // Se já vier no formato C# pronto, usa direto
+            pgConnectionString = databaseUrl;
+        }
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(pgConnectionString));
