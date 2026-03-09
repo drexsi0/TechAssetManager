@@ -1,6 +1,8 @@
 using GerenciadorAtivos.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,17 @@ builder.Services.AddControllersWithViews();
 // 👆 FIM DA CORREÇÃO
 
 var app = builder.Build();
+
+// --- FORÇA O SISTEMA A USAR O PADRÃO BRASILEIRO (R$, Datas, etc) ---
+var defaultCulture = new CultureInfo("pt-BR");
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = new List<CultureInfo> { defaultCulture },
+    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+};
+app.UseRequestLocalization(localizationOptions);
+// -------------------------------------------------------------------
 
 // --- MIGRAÇÃO AUTOMÁTICA (CRIA O BANCO NA NUVEM) ---
 using (var scope = app.Services.CreateScope())
