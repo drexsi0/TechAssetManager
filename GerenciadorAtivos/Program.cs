@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Permite que o PostgreSQL aceite datas locais (como o SQL Server fazia)
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 // --- CONFIGURAÇÃO DE BANCO DE DADOS (POSTGRES SEMPRE) ---
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
                        ?? builder.Configuration.GetConnectionString("DefaultConnection");
