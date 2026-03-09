@@ -4,53 +4,24 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- CONFIGURAÇÃO DE BANCO DE DADOS (HÍBRIDO: LOCAL vs NUVEM) ---
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+// --- CONFIGURAÇÃO DE BANCO DE DADOS (POSTGRES SEMPRE) ---
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
-if (!string.IsNullOrEmpty(databaseUrl))
+// BLINDAGEM: Verifica se não é nulo antes de tentar ler
+if (!string.IsNullOrEmpty(connectionString) &&
+    (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://")))
 {
-    // ESTAMOS NA NUVEM -> USAR POSTGRES
-    try
-    {
-        string pgConnectionString;
+    var databaseUri = new Uri(connectionString);
+    var userInfo = databaseUri.UserInfo.Split(':');
+    var port = databaseUri.Port > 0 ? databaseUri.Port : 5432;
 
-        // Verifica se a URL está no formato de link (postgres://)
-        if (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://"))
-        {
-            var databaseUri = new Uri(databaseUrl);
-            var userInfo = databaseUri.UserInfo.Split(':');
-
-            // O PULO DO GATO: Se a porta não vier na URL, força a padrão (5432)
-            var port = databaseUri.Port > 0 ? databaseUri.Port : 5432;
-
-            pgConnectionString = $"Server={databaseUri.Host};Port={port};Database={databaseUri.AbsolutePath.TrimStart('/')};User Id={userInfo[0]};Password={userInfo[1]};SslMode=Require;Trust Server Certificate=true";
-        }
-        else
-        {
-            // Se já vier no formato C# pronto, usa direto
-            pgConnectionString = databaseUrl;
-        }
-
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(pgConnectionString));
-
-        Console.WriteLine("--> Usando Banco Postgres (Nuvem)");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Erro ao configurar Postgres: {ex.Message}");
-    }
+    connectionString = $"Server={databaseUri.Host};Port={port};Database={databaseUri.AbsolutePath.TrimStart('/')};User Id={userInfo[0]};Password={userInfo[1]};SslMode=Require;Trust Server Certificate=true";
 }
-else
-{
-    // ESTAMOS LOCAL -> USAR SQL SERVER
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString));
 
-    Console.WriteLine("--> Usando SQL Server (Local)");
-}
-// -----------------------------------------------------------
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
+// --------------------------------------------------------
 
 // 👇 CORREÇÃO: Restaurando as configurações do Identity (Login e Roles) e MVC
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
