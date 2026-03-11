@@ -67,6 +67,8 @@ namespace GerenciadorAtivos.Models
                 return valorFinal < 0 ? 0 : valorFinal;
             }
         }
+        // Flag para o Soft Delete
+        public bool IsDeleted { get; set; } = false;
     }
 
     public enum TipoAtivo { Notebook, Desktop, Monitor, Periferico, Servidor }
