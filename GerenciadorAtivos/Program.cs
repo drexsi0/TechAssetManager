@@ -5,6 +5,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,10 +31,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 // --------------------------------------------------------
 
-// 👇 CORREÇÃO: Restaurando as configurações do Identity (Login e Roles) e MVC
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true; // 👈 TRAVA O LOGIN SEM E-MAIL CONFIRMADO
+})
+.AddRoles<IdentityRole>() // Mantém os cargos que criamos
+.AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddControllersWithViews();
 
