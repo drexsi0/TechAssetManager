@@ -91,13 +91,13 @@ namespace GerenciadorAtivos.Controllers
             return View(ativo);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public IActionResult Create() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Create([Bind("Id,Nome,Patrimonio,Tipo,Marca,Modelo,Setor,Status,ValorCompra,DataCompra")] Ativo ativo)
         {
             if (ModelState.IsValid)
@@ -110,7 +110,7 @@ namespace GerenciadorAtivos.Controllers
             return View(ativo);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -122,7 +122,7 @@ namespace GerenciadorAtivos.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Patrimonio,Tipo,Marca,Modelo,Setor,Status,ValorCompra,DataCompra")] Ativo ativo)
         {
             if (id != ativo.Id) return NotFound();
@@ -144,7 +144,7 @@ namespace GerenciadorAtivos.Controllers
             return View(ativo);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -156,7 +156,7 @@ namespace GerenciadorAtivos.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var ativo = await _context.Ativos.FindAsync(id);
