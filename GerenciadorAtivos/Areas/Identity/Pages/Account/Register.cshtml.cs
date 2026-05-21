@@ -159,7 +159,9 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
                         }
                     }
                     // 👆 FIM DA ROTA ÁGIL 👆
-                    foreach (var error in result.Errors)
+                }
+
+                foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
