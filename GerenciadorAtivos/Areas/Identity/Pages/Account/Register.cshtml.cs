@@ -118,8 +118,20 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    // 👇 SUBSTiTUA O BLOCO DE ENVIO ANTIGO POR ESTE AQUI 👇
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirme sua conta - TechAsset Manager",
+                        $"<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;'>" +
+                        $"<h2 style='color: #0056b3; text-align: center;'>Bem-vindo ao TechAsset Manager!</h2>" +
+                        $"<p style='font-size: 16px; color: #333;'>Olá,</p>" +
+                        $"<p style='font-size: 16px; color: #333; line-height: 1.5;'>Obrigado por se cadastrar na nossa plataforma. Para garantir a segurança da sua conta, por favor, confirme o seu endereço de e-mail clicando no botão abaixo:</p>" +
+                        $"<div style='text-align: center; margin: 30px 0;'>" +
+                        $"<a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='background-color: #0056b3; color: white; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 5px; display: inline-block; font-weight: bold;'>Confirmar Meu E-mail</a>" +
+                        $"</div>" +
+                        $"<p style='font-size: 14px; color: #777; line-height: 1.5;'>Se o botão acima não funcionar, você também pode copiar e colar o seguinte link no seu navegador:<br>" +
+                        $"<a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='color: #0056b3;'>{callbackUrl}</a></p>" +
+                        $"<hr style='border: 0; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
+                        $"<p style='font-size: 12px; color: #999; text-align: center;'>Este é um e-mail automático enviado pelo sistema. Por favor, não responda a esta mensagem.</p>" +
+                        $"</div>");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

@@ -1,8 +1,13 @@
 ﻿@page
 @model ConfirmEmailModel
 @{
-    ViewData["Title"] = "Confirm email";
+    ViewData["Title"] = "E-mail Confirmado!";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="text-center mt-5">
+    <h1 class="display-4 text-success">@ViewData["Title"]</h1>
+    <p class="lead mt-3">
+        Obrigado por confirmar o seu e-mail. A sua conta já está ativada e pronta para uso.
+    </p>
+    <a href="/Identity/Account/Login" class="btn btn-primary mt-4 px-4 py-2">Ir para o Login</a>
+</div>
