@@ -1,6 +1,6 @@
-using GerenciadorAtivos.Data; // Importante para ver o banco
-using GerenciadorAtivos.Models; // Importante para ver os Enums
-using GerenciadorAtivos.Models.ViewModels; // Importante para ver a ViewModel
+ï»¿using GerenciadorAtivos.Data;
+using GerenciadorAtivos.Models;
+using GerenciadorAtivos.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -10,41 +10,52 @@ namespace GerenciadorAtivos.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _context; // 1. Campo para guardar o banco
+        private readonly ApplicationDbContext _context;
 
-        // 2. Injeção de Dependência no Construtor
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
-            _context = context; // O sistema entrega o banco pronto aqui
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            var ativos = await _context.Ativos.ToListAsync();
+            var totalAtivos = await _context.Ativos.CountAsync();
+            var disponiveis = await _context.Ativos.CountAsync(x => x.Status == StatusAtivo.Disponivel);
+            var emUso = await _context.Ativos.CountAsync(x => x.Status == StatusAtivo.EmUso);
+            var emManutencao = await _context.Ativos.CountAsync(x => x.Status == StatusAtivo.Manutencao);
+
+            var ativosPorStatus = await _context.Ativos
+                .GroupBy(x => x.Status)
+                .Select(g => new { Status = g.Key, Total = g.Count() })
+                .ToDictionaryAsync(g => g.Status.HasValue ? g.Status.Value.ToString() : string.Empty, g => g.Total);
+
+            var ativosPorSetor = await _context.Ativos
+                .GroupBy(x => x.Setor)
+                .Select(g => new { Setor = g.Key, Total = g.Count() })
+                .ToDictionaryAsync(g => g.Setor, g => g.Total);
+
+            var ativosPorTipo = await _context.Ativos
+                .GroupBy(x => x.Tipo)
+                .Select(g => new { Tipo = g.Key, Total = g.Count() })
+                .ToDictionaryAsync(g => g.Tipo.ToString(), g => g.Total);
+
+            var valorTotalInvestido = await _context.Ativos.SumAsync(x => x.ValorCompra);
+            var dadosDepreciacao = await _context.Ativos
+                .Select(x => new { x.ValorCompra, x.DataCompra })
+                .ToListAsync();
 
             var viewModel = new DashboardViewModel
             {
-                TotalAtivos = ativos.Count,
-                EmUso = ativos.Count(x => x.Status == StatusAtivo.EmUso),
-                Disponiveis = ativos.Count(x => x.Status == StatusAtivo.Disponivel),
-                EmManutencao = ativos.Count(x => x.Status == StatusAtivo.Manutencao),
-
-                AtivosPorStatus = ativos
-                    .GroupBy(x => x.Status)
-                    .ToDictionary(
-                        g => g.Key?.ToString() ?? string.Empty, // Ensure non-null string key
-                        g => g.Count()),
-
-                AtivosPorSetor = ativos
-                    .GroupBy(x => x.Setor) // x.Setor aqui é um SetorAtivo (Enum)
-                    .ToDictionary(
-                        g => g.Key.ToString(), // Chave = "Desenvolvimento" (Nome do Enum)
-                        g => g.Count()),
-
-                // --- CÁLCULOS FINANCEIROS (NOVO) ---
-                ValorTotalInvestido = ativos.Sum(x => x.ValorCompra),
-                ValorTotalAtual = ativos.Sum(x => x.ValorAtual) // O C# calcula um por um e soma
+                TotalAtivos = totalAtivos,
+                EmUso = emUso,
+                Disponiveis = disponiveis,
+                EmManutencao = emManutencao,
+                AtivosPorStatus = ativosPorStatus,
+                AtivosPorSetor = ativosPorSetor,
+                AtivosPorTipo = ativosPorTipo,
+                ValorTotalInvestido = valorTotalInvestido,
+                ValorTotalAtual = dadosDepreciacao.Sum(x => CalcularValorAtual(x.ValorCompra, x.DataCompra))
             };
 
             return View(viewModel);
@@ -59,6 +70,14 @@ namespace GerenciadorAtivos.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private static decimal CalcularValorAtual(decimal valorCompra, DateTime dataCompra)
+        {
+            var anosDeUso = (DateTime.Now - dataCompra).TotalDays / 365.0;
+            var valorDepreciado = valorCompra * 0.20m * (decimal)anosDeUso;
+            var valorFinal = valorCompra - valorDepreciado;
+            return valorFinal < 0 ? 0 : valorFinal;
         }
     }
 }

@@ -143,6 +143,30 @@
     </div>
 </div>
 
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Ativos por Tipo</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoTipo"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Resumo Patrimonial</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoValor"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="mt-4 text-center">
     <a asp-controller="Ativos" asp-action="Index" class="btn btn-lg btn-outline-dark">
         Gerenciar Inventário Completo &rarr;
@@ -222,6 +246,48 @@
                 onHover: (event, chartElement) => {
                     event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
                 }
+            }
+        });
+
+        var ctxTipo = document.getElementById('graficoTipo').getContext('2d');
+        var dadosTipo = @Html.Raw(Json.Serialize(Model.AtivosPorTipo));
+
+        new Chart(ctxTipo, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(dadosTipo),
+                datasets: [{
+                    label: 'Quantidade',
+                    data: Object.values(dadosTipo),
+                    backgroundColor: 'rgba(25, 135, 84, 0.65)',
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+
+        var ctxValor = document.getElementById('graficoValor').getContext('2d');
+        var dadosValor = @Html.Raw(Json.Serialize(new[] { Model.ValorTotalInvestido, Model.ValorTotalAtual }));
+        new Chart(ctxValor, {
+            type: 'bar',
+            data: {
+                labels: ['Investido', 'Atual'],
+                datasets: [{
+                    label: 'Valor',
+                    data: dadosValor,
+                    backgroundColor: ['rgba(13, 110, 253, 0.65)', 'rgba(25, 135, 84, 0.65)'],
+                    borderColor: ['rgba(13, 110, 253, 1)', 'rgba(25, 135, 84, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
             }
         });
     </script>

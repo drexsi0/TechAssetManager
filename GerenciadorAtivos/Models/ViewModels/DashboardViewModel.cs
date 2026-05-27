@@ -10,6 +10,7 @@
 
         public Dictionary<string, int> AtivosPorStatus { get; set; } = new Dictionary<string, int>();
         public Dictionary<string, int> AtivosPorSetor { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> AtivosPorTipo { get; set; } = new Dictionary<string, int>();
 
         // --- NOVOS CAMPOS FINANCEIROS ---
         public decimal ValorTotalInvestido { get; set; } // Quanto pagou
