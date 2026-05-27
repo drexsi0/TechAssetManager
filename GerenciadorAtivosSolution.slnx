@@ -3,4 +3,5 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="GerenciadorAtivos/GerenciadorAtivos.csproj" />
+  <Project Path="GerenciadorAtivos.Tests/GerenciadorAtivos.Tests.csproj" />
 </Solution>
