@@ -28,13 +28,19 @@
                                 <i class="bi bi-box-seam-fill"></i> Inventário
                             </a>
                         </li>
-                        @if (User.IsInRole("Admin"))
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-white" asp-area="" asp-controller="Historico" asp-action="Index">Auditoria</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-white" asp-area="" asp-controller="Relatorios" asp-action="Index">Relatórios</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Usuarios" asp-action="Index">Usuários</a>
                             </li>
                         }
                         <li class="nav-item">
