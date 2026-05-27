@@ -54,7 +54,7 @@
                     <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados" aria-expanded="false">
                         <i class="bi bi-funnel"></i> Filtros Avançados ▼
                     </button>
-                    @if (User.IsInRole("Admin"))
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                         {
                             <a asp-action="Create" class="btn btn-success ms-2"> Novo Ativo</a>
                         }
@@ -99,6 +99,7 @@
             <th>Patrimônio</th>
             <th>Tipo</th>
             <th>Setor</th>
+            <th>Responsável</th>
             <th>Status</th>
             <th>Valor Atual</th>
             <th>Ações</th>
@@ -119,6 +120,7 @@
                     }
                     @setorTexto
                 </td>
+                <td>@(item.Responsavel?.Email ?? "Sem responsável")</td>
                 <td>
                     @{
                         string corBadge = "bg-secondary";
@@ -143,12 +145,12 @@
 
                 <td>
                     <div class="btn-group btn-group-sm">
-                        @if (User.IsInRole("Admin"))
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                         {
                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-secondary">Editar</a>
                         }
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info">Ver</a>
-                        @if (User.IsInRole("Admin"))
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                         {
                             <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Excluir</a>
                         }

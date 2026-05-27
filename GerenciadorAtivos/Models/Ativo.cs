@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace GerenciadorAtivos.Models
 {
@@ -34,6 +35,12 @@ namespace GerenciadorAtivos.Models
 
         [Required(ErrorMessage = "Defina o status inicial.")]
         public StatusAtivo? Status { get; set; }
+
+        [Display(Name = "Responsável")]
+        public string? ResponsavelId { get; set; }
+
+        [ForeignKey(nameof(ResponsavelId))]
+        public virtual IdentityUser? Responsavel { get; set; }
 
         // Cria a lista vazia para evitar erro de "NullReference" ao tentar adicionar algo
         public virtual ICollection<Historico> Historicos { get; set; } = new List<Historico>();

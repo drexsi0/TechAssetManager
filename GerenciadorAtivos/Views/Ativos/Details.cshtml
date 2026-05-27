@@ -37,6 +37,9 @@
         <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Status)</dt>
         <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
 
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.ResponsavelId)</dt>
+        <dd class="col-sm-10">@(Model.Responsavel?.Email ?? "Sem responsável")</dd>
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ValorCompra)
         </dt>
@@ -113,7 +116,7 @@ else
 }
 
 <div class="mt-4">
-    @if (User.IsInRole("Admin"))
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
     {
         <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Editar</a>
     }

@@ -24,6 +24,7 @@ namespace GerenciadorAtivos.Data
                 {
                     entry.State = EntityState.Modified;
                     ativoExcluido.IsDeleted = true;
+
                 }
 
                 // 2. A REGRA DA AUDITORIA GRANULAR (O Novo!)
@@ -77,6 +78,12 @@ namespace GerenciadorAtivos.Data
 
             // Filtro Global: Toda vez que o sistema buscar os ativos, ignore os que estão "deletados"
             builder.Entity<Ativo>().HasQueryFilter(a => !a.IsDeleted);
+
+            builder.Entity<Ativo>()
+                .HasOne(a => a.Responsavel)
+                .WithMany()
+                .HasForeignKey(a => a.ResponsavelId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

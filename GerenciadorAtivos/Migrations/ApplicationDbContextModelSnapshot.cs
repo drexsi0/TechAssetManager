@@ -56,6 +56,9 @@ namespace GerenciadorAtivos.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<string>("ResponsavelId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Setor")
                         .IsRequired()
                         .HasColumnType("text");
@@ -70,6 +73,8 @@ namespace GerenciadorAtivos.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ResponsavelId");
 
                     b.ToTable("Ativos");
                 });
@@ -315,6 +320,16 @@ namespace GerenciadorAtivos.Migrations
                         .IsRequired();
 
                     b.Navigation("Ativo");
+                });
+
+            modelBuilder.Entity("GerenciadorAtivos.Models.Ativo", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Responsavel")
+                        .WithMany()
+                        .HasForeignKey("ResponsavelId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Responsavel");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
