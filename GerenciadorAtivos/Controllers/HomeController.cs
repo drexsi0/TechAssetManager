@@ -28,19 +28,21 @@ namespace GerenciadorAtivos.Controllers
             var ativosPorStatus = await _context.Ativos
                 .GroupBy(x => x.Status)
                 .Select(g => new { Status = g.Key, Total = g.Count() })
-                .ToDictionaryAsync(g => g.Status.HasValue ? g.Status.Value.ToString() : string.Empty, g => g.Total);
+                .ToDictionaryAsync(g => g.Status.HasValue ? g.Status.Value.ToString() : "Sem status", g => g.Total);
 
             var ativosPorSetor = await _context.Ativos
                 .GroupBy(x => x.Setor)
                 .Select(g => new { Setor = g.Key, Total = g.Count() })
-                .ToDictionaryAsync(g => g.Setor, g => g.Total);
+                .ToDictionaryAsync(g => string.IsNullOrWhiteSpace(g.Setor) ? "Sem setor" : g.Setor, g => g.Total);
 
             var ativosPorTipo = await _context.Ativos
                 .GroupBy(x => x.Tipo)
                 .Select(g => new { Tipo = g.Key, Total = g.Count() })
                 .ToDictionaryAsync(g => g.Tipo.ToString(), g => g.Total);
 
-            var valorTotalInvestido = await _context.Ativos.SumAsync(x => x.ValorCompra);
+            var valorTotalInvestido = await _context.Ativos
+                .Select(x => (decimal?)x.ValorCompra)
+                .SumAsync() ?? 0m;
             var dadosDepreciacao = await _context.Ativos
                 .Select(x => new { x.ValorCompra, x.DataCompra })
                 .ToListAsync();
