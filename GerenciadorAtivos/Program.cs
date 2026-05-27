@@ -87,6 +87,8 @@ using (var scope = app.Services.CreateScope())
     {
         context.Database.Migrate();
     }
+
+    await EnsureAssetResponsavelSchemaAsync(context);
 }
 // ---------------------------------------------------
 
@@ -145,3 +147,33 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+static async Task EnsureAssetResponsavelSchemaAsync(ApplicationDbContext context)
+{
+    await context.Database.ExecuteSqlRawAsync("""
+        ALTER TABLE "Ativos"
+        ADD COLUMN IF NOT EXISTS "ResponsavelId" text;
+        """);
+
+    await context.Database.ExecuteSqlRawAsync("""
+        CREATE INDEX IF NOT EXISTS "IX_Ativos_ResponsavelId"
+        ON "Ativos" ("ResponsavelId");
+        """);
+
+    await context.Database.ExecuteSqlRawAsync("""
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'FK_Ativos_AspNetUsers_ResponsavelId'
+            ) THEN
+                ALTER TABLE "Ativos"
+                ADD CONSTRAINT "FK_Ativos_AspNetUsers_ResponsavelId"
+                FOREIGN KEY ("ResponsavelId")
+                REFERENCES "AspNetUsers" ("Id")
+                ON DELETE SET NULL;
+            END IF;
+        END $$;
+        """);
+}
