@@ -1,70 +1,105 @@
-# TechAsset Manager
+Ôªø# TechAsset Manager
 
-Sistema corporativo para gerenciamento e controle de invent·rio de ativos de TI (Hardware e PerifÈricos). Desenvolvido como projeto de portfÛlio focando em boas pr·ticas de Engenharia de Software, Arquitetura MVC e Rastreabilidade.
+Sistema web para gerenciamento de invent√°rio de ativos de TI, desenvolvido em ASP.NET Core MVC como projeto principal de portf√≥lio. O foco √© demonstrar autentica√ß√£o, autoriza√ß√£o por perfis, rastreabilidade, Entity Framework Core, PostgreSQL, Docker e uma UI administrativa simples com Razor Views.
 
-![Badge](https://img.shields.io/badge/Status-Versao%201.1.0-blue) ![.NET](https://img.shields.io/badge/.NET-ASP.NET_Core-purple)
+![Status](https://img.shields.io/badge/status-portfolio%20ready-blue) ![.NET](https://img.shields.io/badge/.NET-10%20Preview-purple) ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-MVC-512bd4)
 
+## Problema
 
-## Screenshots
+Empresas pequenas e m√©dias frequentemente controlam notebooks, monitores, perif√©ricos e servidores em planilhas descentralizadas. Isso dificulta saber onde cada item est√°, quem √© o respons√°vel, qual √© o status operacional e qual √© o valor patrimonial aproximado.
 
-### Dashboard Gerencial
-Vis„o geral com indicadores conectados ao banco de dados (`CountAsync`), oferecendo dados vivos sobre o invent·rio.
-<img width="1852" height="910" alt="Image" src="https://github.com/user-attachments/assets/a1834ed1-9e73-4df7-848e-c1169ec4e3c6" />
+## Solu√ß√£o
 
-### Listagem com Busca e PaginaÁ„o
-Controle de invent·rio com filtros avanÁados (Nome/PatrimÙnio + Status) e paginaÁ„o no servidor.
-<img width="1854" height="909" alt="Image" src="https://github.com/user-attachments/assets/85a0c441-584a-465a-9a57-42ceed979fc1" />
-
-### Cadastro e ValidaÁ„o
-Formul·rios com validaÁ„o de dados e feedback visual.
-<img width="1830" height="918" alt="Image" src="https://github.com/user-attachments/assets/c5113455-5280-48ae-ac7d-f6688a56a808" />
-
-### Detalhes e Rastreabilidade
-Vis„o detalhada do ativo integrada ao log de auditoria, permitindo rastrear cronologicamente todas as alteraÁıes e mudanÁas de status.
-<img width="1851" height="905" alt="Image" src="https://github.com/user-attachments/assets/167d1cc2-a398-46c3-832b-abbb6ac3e6ca" />
-
----
+O TechAsset Manager centraliza o cadastro de ativos, permite acompanhar status e setor, atribuir respons√°veis, consultar hist√≥rico de movimenta√ß√µes e exportar relat√≥rios em Excel. O projeto foi constru√≠do como uma aplica√ß√£o MVC server-side para manter simplicidade operacional e boa ader√™ncia ao ecossistema .NET.
 
 ## Funcionalidades
 
-### Gest„o e Controle (Core)
-- [x] **CRUD Completo:** CriaÁ„o, Leitura, AtualizaÁ„o e Exclus„o de ativos.
-- [x] **Dashboard Conectado:** Painel gerencial alimentado em tempo real pelo banco de dados.
-- [x] **Busca e Filtros:** Pesquisa textual (LINQ) combinada com filtros de Status (Enums).
-- [x] **PaginaÁ„o:** OtimizaÁ„o de performance no Back-end (*Server-side pagination*) para grandes volumes de dados.
+- Dashboard com indicadores de invent√°rio, valor investido, valor atual estimado e gr√°ficos por setor, status e tipo.
+- CRUD de ativos com valida√ß√£o via Data Annotations.
+- Atribui√ß√£o de ativos a usu√°rios cadastrados.
+- Auditoria de cria√ß√£o, edi√ß√£o, atribui√ß√£o e exclus√£o l√≥gica.
+- Soft delete para preservar hist√≥rico.
+- Busca, filtros combinados e pagina√ß√£o server-side.
+- Exporta√ß√£o de relat√≥rio em Excel com ClosedXML.
+- ASP.NET Core Identity com confirma√ß√£o de e-mail, 2FA e lockout em falhas de login.
+- RBAC com perfis `Admin`, `Manager` e `User`.
+- Tela administrativa para altera√ß√£o de perfis de usu√°rios.
+- Dockerfile e GitHub Actions para build, testes e auditoria de pacotes.
 
-### SeguranÁa e Qualidade
-- [x] **Auditoria de Dados:** Sistema de histÛrico autom·tico que registra criaÁıes e ediÁıes para rastreabilidade (`1:N Relationship`).
-- [x] **ValidaÁ„o Robusta:** Regras de negÛcio via *Data Annotations* e tratamento de erros defensivo.
-- [x] **Identidade Visual:** Interface corporativa baseada em Bootstrap 5 com feedback visual de status.
+## Stack
 
----
+- C# e ASP.NET Core MVC/Razor Pages
+- ASP.NET Core Identity
+- Entity Framework Core com migrations
+- PostgreSQL via Npgsql
+- Bootstrap 5, Razor Views e Chart.js
+- ClosedXML para exporta√ß√£o Excel
+- xUnit para testes automatizados
+- Docker e GitHub Actions
 
-## Tecnologias Utilizadas
+## Seguran√ßa
 
-- **Linguagem:** C#
-- **Framework:** ASP.NET Core MVC (.NET 10 Preview ñ projeto de estudo)
-- **Banco de Dados:** SQL Server / Entity Framework Core
-- **Conceitos Aplicados:** Repository Pattern (Simulado), LINQ, Migrations, Dependency Injection.
-- **Front-end:** Razor Views, Bootstrap 5, CSS Customizado
-- **Controle de Vers„o:** Git & GitHub.
+O projeto evita credenciais versionadas. Configure dados sens√≠veis por User Secrets no ambiente local ou vari√°veis de ambiente no deploy.
 
----
-
-## Como Rodar o Projeto
-
-1. **Clone o repositÛrio:**
+Vari√°veis esperadas:
 
 ```bash
-git clone https://github.com/drexsi0/TechAssetManager.git
+DATABASE_URL=postgres://usuario:senha/host/banco
+Smtp__User=seu-email-smtp
+Smtp__Pass=sua-senha-ou-app-password
+SEED_ADMIN_EMAIL=admin@exemplo.com
+SEED_ADMIN_PASSWORD=uma-senha-forte
+DEMO_MODE=false
 ```
 
-2. **Configure o Banco de Dados:**
-Certifique-se de ter o SQL Server (LocalDB) instalado. O Entity Framework aplicar· as Migrations automaticamente ao rodar (Update-Database implÌcito ou via Package Manager Console).
+Notas importantes:
 
-3. **Execute a AplicaÁ„o:**
-Abra a soluÁ„o no Visual Studio e pressione `F5`.
+- `DEMO_MODE=true` auto-confirma o e-mail no cadastro para facilitar demonstra√ß√µes p√∫blicas. Use apenas em ambiente de demo.
+- O seed de administrador s√≥ roda se `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` estiverem configurados.
+- Depois de qualquer segredo exposto, rotacione a credencial no provedor externo antes de publicar o reposit√≥rio.
 
----
+## Como rodar localmente
 
-Desenvolvido por **Pedro Henrique**, como parte de estudos avanÁados em Desenvolvimento Fullstack .NET.
+1. Clone o reposit√≥rio.
+2. Configure a connection string e SMTP via User Secrets ou vari√°veis de ambiente.
+3. Restaure e compile:
+
+```bash
+dotnet restore GerenciadorAtivosSolution.slnx
+dotnet build GerenciadorAtivosSolution.slnx
+```
+
+4. Execute a aplica√ß√£o:
+
+```bash
+dotnet run --project GerenciadorAtivos/GerenciadorAtivos.csproj
+```
+
+5. Acesse a URL exibida pelo ASP.NET Core.
+
+## Testes e auditoria
+
+```bash
+dotnet test GerenciadorAtivosSolution.slnx
+dotnet list GerenciadorAtivos/GerenciadorAtivos.csproj package --vulnerable --include-transitive
+```
+
+## Decis√µes t√©cnicas
+
+- MVC server-side em vez de SPA para reduzir complexidade e destacar fundamentos de backend .NET.
+- EF Core Code First para versionar evolu√ß√£o do schema.
+- Identity padr√£o customizado em vez de autentica√ß√£o pr√≥pria.
+- Soft delete para preservar rastreabilidade.
+- Roles simples e expl√≠citas para facilitar demonstra√ß√£o de autoriza√ß√£o.
+
+## Pr√≥ximas melhorias
+
+- Criar uma API REST complementar para integra√ß√£o externa.
+- Adicionar testes de controller/autoriza√ß√£o com WebApplicationFactory.
+- Adicionar logs estruturados e health checks.
+- Criar uma demo em v√≠deo curto ou GIF mostrando login, dashboard, CRUD, atribui√ß√£o, auditoria e exporta√ß√£o.
+- Evoluir a tela de usu√°rios para bloquear/desbloquear contas e resetar 2FA.
+
+## Autor
+
+Desenvolvido por Pedro Henrique como projeto de portf√≥lio em desenvolvimento fullstack .NET.
