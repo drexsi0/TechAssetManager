@@ -29,13 +29,15 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -43,6 +45,7 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         /// <summary>
@@ -109,6 +112,13 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
+                    if (!await _roleManager.RoleExistsAsync("User"))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole("User"));
+                    }
+
+                    await _userManager.AddToRoleAsync(user, "User");
+
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -118,22 +128,18 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
     values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
     protocol: Request.Scheme);
 
-                    // 👇 INÍCIO DA ROTA ÁGIL (BYPASS DE PRODUÇÃO) 👇
-                    var isRender = Environment.GetEnvironmentVariable("RENDER") == "true";
+                    var demoMode = Environment.GetEnvironmentVariable("DEMO_MODE") == "true";
 
-                    if (isRender)
+                    if (demoMode)
                     {
-                        // 1. Decodifica o token e auto-confirma o e-mail no banco de dados
                         var tokenBruto = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
                         await _userManager.ConfirmEmailAsync(user, tokenBruto);
 
-                        // 2. Faz o login automático do usuário e joga ele para a Home
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect("~/");
                     }
                     else
                     {
-                        // 3. SE ESTIVER NO SEU PC (LOCAL): Mantém o envio real via Gmail com HTML profissional
                         await _emailSender.SendEmailAsync(Input.Email, "Confirme sua conta - TechAsset Manager",
                             $"<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;'>" +
                             $"<h2 style='color: #0056b3; text-align: center;'>Bem-vindo ao TechAsset Manager!</h2>" +
@@ -158,7 +164,6 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
                             return LocalRedirect(returnUrl);
                         }
                     }
-                    // 👆 FIM DA ROTA ÁGIL 👆
                 }
 
                 foreach (var error in result.Errors)

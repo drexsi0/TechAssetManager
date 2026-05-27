@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GerenciadorAtivos.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager")]
     public class RelatoriosController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,7 +26,9 @@ namespace GerenciadorAtivos.Controllers
         public async Task<IActionResult> ExportarAtivosExcel()
         {
             // 1. Busca os dados no banco
-            var ativos = await _context.Ativos.ToListAsync();
+            var ativos = await _context.Ativos
+                .Include(a => a.Responsavel)
+                .ToListAsync();
 
             // 2. Cria o arquivo Excel na memória
             using (var workbook = new XLWorkbook())
@@ -41,13 +43,13 @@ namespace GerenciadorAtivos.Controllers
                 worksheet.Cell(1, 5).Value = "Setor";
                 worksheet.Cell(1, 6).Value = "Status";
                 worksheet.Cell(1, 7).Value = "Marca/Modelo";
-                // NOVAS COLUNAS
-                worksheet.Cell(1, 8).Value = "Data Compra";
-                worksheet.Cell(1, 9).Value = "Valor Pago";
-                worksheet.Cell(1, 10).Value = "Valor Atual";
+                worksheet.Cell(1, 8).Value = "Responsável";
+                worksheet.Cell(1, 9).Value = "Data Compra";
+                worksheet.Cell(1, 10).Value = "Valor Pago";
+                worksheet.Cell(1, 11).Value = "Valor Atual";
 
                 // Estiliza o cabeçalho
-                var header = worksheet.Range("A1:J1"); // Aumentei de G1 para J1
+                var header = worksheet.Range("A1:K1");
                 header.Style.Font.Bold = true;
                 header.Style.Fill.BackgroundColor = XLColor.LightGray;
 
@@ -72,14 +74,14 @@ namespace GerenciadorAtivos.Controllers
 
                     worksheet.Cell(linha, 6).Value = item.Status.ToString();
                     worksheet.Cell(linha, 7).Value = $"{item.Marca} {item.Modelo}";
+                    worksheet.Cell(linha, 8).Value = item.Responsavel?.Email ?? "Sem responsável";
 
-                    // NOVOS DADOS
-                    worksheet.Cell(linha, 8).Value = item.DataCompra;
-                    worksheet.Cell(linha, 9).Value = item.ValorCompra;
-                    worksheet.Cell(linha, 9).Style.NumberFormat.Format = "R$ #,##0.00"; // Formata Dinheiro no Excel
+                    worksheet.Cell(linha, 9).Value = item.DataCompra;
+                    worksheet.Cell(linha, 10).Value = item.ValorCompra;
+                    worksheet.Cell(linha, 10).Style.NumberFormat.Format = "R$ #,##0.00";
 
-                    worksheet.Cell(linha, 10).Value = item.ValorAtual;
-                    worksheet.Cell(linha, 10).Style.NumberFormat.Format = "R$ #,##0.00"; // Formata Dinheiro no Excel
+                    worksheet.Cell(linha, 11).Value = item.ValorAtual;
+                    worksheet.Cell(linha, 11).Style.NumberFormat.Format = "R$ #,##0.00";
 
                     // Pinta status Manutenção (mantém sua lógica)
                     if (item.Status == StatusAtivo.Manutencao)

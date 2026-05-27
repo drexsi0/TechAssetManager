@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GerenciadorAtivos.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager")]
     public class HistoricoController : Controller
     {
         private readonly ApplicationDbContext _context;

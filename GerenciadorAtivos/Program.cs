@@ -12,11 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Permite que o PostgreSQL aceite datas locais (como o SQL Server fazia)
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-// --- CONFIGURAÇÃO DE BANCO DE DADOS (POSTGRES SEMPRE) ---
+// --- CONFIGURAÃ‡ÃƒO DE BANCO DE DADOS (POSTGRES SEMPRE) ---
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
                        ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
-// BLINDAGEM: Verifica se não é nulo antes de tentar ler
+// BLINDAGEM: Verifica se nÃ£o Ã© nulo antes de tentar ler
 if (!string.IsNullOrEmpty(connectionString) &&
     (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://")))
 {
@@ -33,9 +33,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true; // 👈 TRAVA O LOGIN SEM E-MAIL CONFIRMADO
+    options.SignIn.RequireConfirmedAccount = true;
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
-.AddRoles<IdentityRole>() // Mantém os cargos que criamos
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
@@ -45,12 +48,12 @@ builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
-            // Usa o IP do usuário como chave de bloqueio
+            // Usa o IP do usuÃ¡rio como chave de bloqueio
             partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "desconhecido",
             factory: partition => new FixedWindowRateLimiterOptions
             {
                 AutoReplenishment = true,
-                PermitLimit = 100, // Máximo de requisições
+                PermitLimit = 100, // MÃ¡ximo de requisiÃ§Ãµes
                 QueueLimit = 0,
                 Window = TimeSpan.FromMinutes(1) // Tempo da janela
             }));
@@ -62,7 +65,7 @@ var app = builder.Build();
 
 app.UseRateLimiter();
 
-// --- FORÇA O SISTEMA A USAR O PADRÃO BRASILEIRO (R$, Datas, etc) ---
+// --- FORÃ‡A O SISTEMA A USAR O PADRÃƒO BRASILEIRO (R$, Datas, etc) ---
 var defaultCulture = new CultureInfo("pt-BR");
 var localizationOptions = new RequestLocalizationOptions
 {
@@ -73,13 +76,13 @@ var localizationOptions = new RequestLocalizationOptions
 app.UseRequestLocalization(localizationOptions);
 // -------------------------------------------------------------------
 
-// --- MIGRAÇÃO AUTOMÁTICA (CRIA O BANCO NA NUVEM) ---
+// --- MIGRAÃ‡ÃƒO AUTOMÃTICA (CRIA O BANCO NA NUVEM) ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
 
-    // Se tiver mudanças pendentes no banco, aplica agora!
+    // Se tiver mudanÃ§as pendentes no banco, aplica agora!
     if (context.Database.GetPendingMigrations().Any())
     {
         context.Database.Migrate();
@@ -87,12 +90,12 @@ using (var scope = app.Services.CreateScope())
 }
 // ---------------------------------------------------
 
-// --- INÍCIO DOS SEEDS (Popula o banco inicialmente) ---
+// --- INÃCIO DOS SEEDS (Popula o banco inicialmente) ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    // 1. Seed de Ativos e Históricos Iniciais
+    // 1. Seed de Ativos e HistÃ³ricos Iniciais
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
@@ -104,7 +107,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "Um erro ocorreu ao popular o banco de dados com ativos.");
     }
 
-    // 2. Seed de Perfis (Roles) e Usuário Admin
+    // 2. Seed de Perfis (Roles) e UsuÃ¡rio Admin
     try
     {
         await GerenciadorAtivos.Data.SeedData.Initialize(services);
@@ -112,7 +115,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Um erro ocorreu ao criar os perfis de usuário.");
+        logger.LogError(ex, "Um erro ocorreu ao criar os perfis de usuÃ¡rio.");
     }
 }
 // ---------------------------------------------------
@@ -127,7 +130,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// 👇 CORREÇÃO: Authentication DEVE vir antes do Authorization
+// ðŸ‘‡ CORREÃ‡ÃƒO: Authentication DEVE vir antes do Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -138,22 +141,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Obrigatório para as telas de Login/Registro funcionarem
+// ObrigatÃ³rio para as telas de Login/Registro funcionarem
 app.MapRazorPages();
-
-// 👇 BLOCO PARA CRIAR OS CARGOS (ROLES) AUTOMATICAMENTE 👇
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "SuperAdmin", "Admin" };
-
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-    }
-}
 
 app.Run();
