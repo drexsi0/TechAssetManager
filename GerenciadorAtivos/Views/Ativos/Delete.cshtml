@@ -1,39 +1,40 @@
-﻿@model GerenciadorAtivos.Models.Ativo
+@model GerenciadorAtivos.Models.Ativo
+@inject IUiTextService T
 
 @{
-    ViewData["Title"] = "Excluir";
+    ViewData["Title"] = T.IsEnglish ? "Delete asset" : "Excluir ativo";
+    var setorTexto = Html.GetEnumSelectList<GerenciadorAtivos.Models.SetorAtivo>()
+        .FirstOrDefault(x => x.Value == Model.Setor)?.Text ?? Model.Setor;
 }
 
-<h1>Excluir Ativo</h1>
+<section class="dashboard-hero">
+    <div>
+        <span class="eyebrow">@T["Nav.Inventory"]</span>
+        <h1 class="dashboard-title">@ViewData["Title"]</h1>
+        <p class="dashboard-subtitle text-danger">@(T.IsEnglish ? "Confirm the logical removal of this asset from the active inventory." : "Confirme a remocao logica deste ativo do inventario ativo.")</p>
+    </div>
+</section>
 
-<h3 class="text-danger">Tem certeza que deseja excluir este item permanentemente?</h3>
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Nome)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Nome)</dd>
+<div class="app-card">
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        @(T.IsEnglish ? "This asset will no longer appear in active inventory lists." : "Este ativo nao aparecera mais nas listas ativas do inventario.")
+    </div>
 
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Patrimonio)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Patrimonio)</dd>
-
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Tipo)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Tipo)</dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Setor)
-        </dt>
-        <dd class="col-sm-10">
-            @{
-                var setorTexto = Html.GetEnumSelectList<GerenciadorAtivos.Models.SetorAtivo>()
-                .FirstOrDefault(x => x.Value == Model.Setor)?.Text ?? Model.Setor;
-            }
-            @setorTexto
-        </dd>
+    <dl class="detail-list">
+        <dt>@T["Common.Name"]</dt>
+        <dd>@Model.Nome</dd>
+        <dt>@T["Common.Patrimony"]</dt>
+        <dd><code>@Model.Patrimonio</code></dd>
+        <dt>@T["Common.Type"]</dt>
+        <dd>@Html.DisplayFor(model => model.Tipo)</dd>
+        <dt>@T["Common.Sector"]</dt>
+        <dd>@setorTexto</dd>
     </dl>
 
-    <form asp-action="Delete" class="mt-4">
+    <form asp-action="Delete" class="form-actions">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Confirmar Exclusão" class="btn btn-danger" />
-        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Cancelar</a>
+        <button type="submit" class="btn btn-danger">@(T.IsEnglish ? "Confirm deletion" : "Confirmar exclusao")</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@(T.IsEnglish ? "Cancel" : "Cancelar")</a>
     </form>
 </div>

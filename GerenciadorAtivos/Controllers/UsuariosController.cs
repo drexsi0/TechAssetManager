@@ -50,7 +50,7 @@ namespace GerenciadorAtivos.Controllers
         {
             if (!SupportedRoles.Contains(selectedRole))
             {
-                return BadRequest("Perfil inválido.");
+                return BadRequest("Perfil invalido.");
             }
 
             var user = await _userManager.FindByIdAsync(userId);

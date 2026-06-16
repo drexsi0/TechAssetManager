@@ -1,100 +1,92 @@
-﻿@model GerenciadorAtivos.Models.Ativo
+@model GerenciadorAtivos.Models.Ativo
+@inject IUiTextService T
 
 @{
-    ViewData["Title"] = "Editar Ativo";
+    ViewData["Title"] = T.IsEnglish ? "Edit asset" : "Editar ativo";
 }
 
-<h1>Editar Ativo</h1>
+<section class="dashboard-hero">
+    <div>
+        <span class="eyebrow">@T["Nav.Inventory"]</span>
+        <h1 class="dashboard-title">@ViewData["Title"]</h1>
+        <p class="dashboard-subtitle">@(T.IsEnglish ? "Update equipment data, status and responsible user." : "Atualize dados, status e responsavel do equipamento.")</p>
+    </div>
+</section>
 
-<h4>Atualizar Informações</h4>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+<div class="app-card">
+    <form asp-action="Edit" class="form-shell">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
 
-            <div class="form-group mb-3">
-                <label asp-for="Nome" class="control-label"></label>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Nome" class="form-label"></label>
                 <input asp-for="Nome" class="form-control" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Patrimonio" class="control-label"></label>
+            <div class="col-md-6">
+                <label asp-for="Patrimonio" class="form-label"></label>
                 <input asp-for="Patrimonio" class="form-control" />
                 <span asp-validation-for="Patrimonio" class="text-danger"></span>
             </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label asp-for="Tipo" class="control-label"></label>
-                    <select asp-for="Tipo" class="form-select" asp-items="Html.GetEnumSelectList<GerenciadorAtivos.Models.TipoAtivo>()"></select>
-                    <span asp-validation-for="Tipo" class="text-danger"></span>
-                </div>
-
-                <div class="col-md-6">
-                    <label asp-for="Setor" class="control-label"></label>
-                    <select asp-for="Setor" class="form-select" asp-items="Html.GetEnumSelectList<GerenciadorAtivos.Models.SetorAtivo>()">
-                    </select>
-                    <span asp-validation-for="Setor" class="text-danger"></span>
-                </div>
+            <div class="col-md-6">
+                <label asp-for="Tipo" class="form-label"></label>
+                <select asp-for="Tipo" class="form-select" asp-items="Html.GetEnumSelectList<GerenciadorAtivos.Models.TipoAtivo>()"></select>
+                <span asp-validation-for="Tipo" class="text-danger"></span>
             </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label asp-for="Marca" class="control-label"></label>
-                    <input asp-for="Marca" class="form-control" />
-                    <span asp-validation-for="Marca" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="Modelo" class="control-label"></label>
-                    <input asp-for="Modelo" class="form-control" />
-                    <span asp-validation-for="Modelo" class="text-danger"></span>
-                </div>
+            <div class="col-md-6">
+                <label asp-for="Setor" class="form-label"></label>
+                <select asp-for="Setor" class="form-select" asp-items="Html.GetEnumSelectList<GerenciadorAtivos.Models.SetorAtivo>()"></select>
+                <span asp-validation-for="Setor" class="text-danger"></span>
             </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Status" class="control-label"></label>
+            <div class="col-md-6">
+                <label asp-for="Marca" class="form-label"></label>
+                <input asp-for="Marca" class="form-control" />
+                <span asp-validation-for="Marca" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Modelo" class="form-label"></label>
+                <input asp-for="Modelo" class="form-control" />
+                <span asp-validation-for="Modelo" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Status" class="form-label"></label>
                 <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<GerenciadorAtivos.Models.StatusAtivo>()"></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="ResponsavelId" class="control-label"></label>
+            <div class="col-md-6">
+                <label asp-for="ResponsavelId" class="form-label"></label>
                 <select asp-for="ResponsavelId" class="form-select" asp-items="ViewBag.ResponsavelId">
-                    <option value="">Sem responsável</option>
+                    <option value="">@T["Common.NoResponsible"]</option>
                 </select>
                 <span asp-validation-for="ResponsavelId" class="text-danger"></span>
             </div>
+        </div>
 
-            <h5 class="mt-4 text-muted border-bottom pb-2">Dados Financeiros</h5>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label asp-for="ValorCompra" class="control-label"></label>
-                    <div class="input-group">
-                        <span class="input-group-text">R$</span>
-                        <input asp-for="ValorCompra" class="form-control" type="number" step="0.01" placeholder="0,00" />
-                    </div>
-                    <span asp-validation-for="ValorCompra" class="text-danger"></span>
+        <h2 class="section-title">@(T.IsEnglish ? "Financial data" : "Dados financeiros")</h2>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="ValorCompra" class="form-label"></label>
+                <div class="input-group">
+                    <span class="input-group-text">R$</span>
+                    <input asp-for="ValorCompra" class="form-control" type="number" step="0.01" placeholder="0,00" />
                 </div>
-                <div class="col-md-6">
-                    <label asp-for="DataCompra" class="control-label"></label>
-                    <input asp-for="DataCompra" class="form-control" />
-                    <span asp-validation-for="DataCompra" class="text-danger"></span>
-                </div>
+                <span asp-validation-for="ValorCompra" class="text-danger"></span>
             </div>
+            <div class="col-md-6">
+                <label asp-for="DataCompra" class="form-label"></label>
+                <input asp-for="DataCompra" class="form-control" />
+                <span asp-validation-for="DataCompra" class="text-danger"></span>
+            </div>
+        </div>
 
-            <div class="form-group mt-4">
-                <input type="submit" value="Salvar Alterações" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
-            </div>
-        </form>
-    </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">@(T.IsEnglish ? "Save changes" : "Salvar alteracoes")</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">@(T.IsEnglish ? "Back" : "Voltar")</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

@@ -1,124 +1,96 @@
-﻿@model GerenciadorAtivos.Models.Ativo
+@model GerenciadorAtivos.Models.Ativo
+@inject IUiTextService T
 
 @{
-    ViewData["Title"] = "Detalhes";
+    ViewData["Title"] = T.IsEnglish ? "Asset details" : "Detalhes do ativo";
+    var setorTexto = Html.GetEnumSelectList<GerenciadorAtivos.Models.SetorAtivo>()
+        .FirstOrDefault(x => x.Value == Model.Setor)?.Text ?? Model.Setor;
 }
 
-<h1>Detalhes do Ativo</h1>
-
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Nome)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Nome)</dd>
-
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Patrimonio)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Patrimonio)</dd>
-
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Tipo)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Tipo)</dd>
-
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Marca)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Marca)</dd>
-
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Modelo)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Modelo)</dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Setor)
-        </dt>
-        <dd class="col-sm-10">
-            @{
-                var setorTexto = Html.GetEnumSelectList<GerenciadorAtivos.Models.SetorAtivo>()
-                .FirstOrDefault(x => x.Value == Model.Setor)?.Text ?? Model.Setor;
-            }
-            @setorTexto
-        </dd>
-
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Status)</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Status)</dd>
-
-        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.ResponsavelId)</dt>
-        <dd class="col-sm-10">@(Model.Responsavel?.Email ?? "Sem responsável")</dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ValorCompra)
-        </dt>
-        <dd class="col-sm-10">
-            @Model.ValorCompra.ToString("C")
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DataCompra)
-        </dt>
-        <dd class="col-sm-10">
-            @Model.DataCompra.ToShortDateString()
-        </dd>
-
-        <dt class="col-sm-2">
-            Valor Atual (Estimado)
-        </dt>
-        <dd class="col-sm-10 text-success fw-bold">
-            @Model.ValorAtual.ToString("C")
-            <small class="text-muted fw-normal ms-2">
-                (Depreciação de @((Model.ValorCompra - Model.ValorAtual).ToString("C")))
-            </small>
-        </dd>
-    </dl>
-    <hr />
-</div>
-
-<h4 class="mb-3"><i class="fa fa-history"></i> Histórico de Movimentações</h4>
-
-@if (Model.Historicos != null && Model.Historicos.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Data/Hora</th>
-                    <th>Usuário</th>
-                    <th>Ação</th>
-                    <th>Detalhes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Historicos.OrderByDescending(h => h.DataAcao))
-                {
-                    <tr>
-                        <td>@item.DataAcao.ToString("dd/MM/yyyy HH:mm")</td>
-
-                        <td>
-                            @(string.IsNullOrEmpty(item.Usuario) ? "Sistema" : item.Usuario)
-                        </td>
-
-                        <td>
-                            @if (item.TipoAcao == "Criação")
-                            {
-                                <span class="badge bg-success">Criação</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">@item.TipoAcao</span>
-                            }
-                        </td>
-                        <td>@item.Descricao</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<section class="dashboard-hero">
+    <div>
+        <span class="eyebrow">@T["Nav.Inventory"]</span>
+        <h1 class="dashboard-title">@Model.Nome</h1>
+        <p class="dashboard-subtitle">@T["Common.Patrimony"]: @Model.Patrimonio</p>
     </div>
-}
-else
-{
-    <div class="alert alert-light text-center border">
-        <span class="text-muted">Nenhum histórico registrado para este ativo ainda.</span>
+    <div class="d-flex gap-2">
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>@(T.IsEnglish ? "Edit" : "Editar")</a>
+        }
+        <a asp-action="Index" class="btn btn-outline-secondary">@(T.IsEnglish ? "Back" : "Voltar")</a>
     </div>
-}
+</section>
 
-<div class="mt-4">
-    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Editar</a>
-    }
-    <a asp-action="Index" class="btn btn-outline-secondary ms-2">Voltar para Lista</a>
+<div class="dashboard-grid">
+    <section class="dashboard-panel grid-span-7">
+        <div class="panel-header">
+            <h2>@(T.IsEnglish ? "Asset data" : "Dados do ativo")</h2>
+        </div>
+        <dl class="detail-list">
+            <dt>@T["Common.Name"]</dt>
+            <dd>@Model.Nome</dd>
+            <dt>@T["Common.Patrimony"]</dt>
+            <dd><code>@Model.Patrimonio</code></dd>
+            <dt>@T["Common.Type"]</dt>
+            <dd>@Html.DisplayFor(model => model.Tipo)</dd>
+            <dt>@T["Common.BrandModel"]</dt>
+            <dd>@Model.Marca / @Model.Modelo</dd>
+            <dt>@T["Common.Sector"]</dt>
+            <dd>@setorTexto</dd>
+            <dt>@T["Common.Status"]</dt>
+            <dd>@Html.DisplayFor(model => model.Status)</dd>
+            <dt>@T["Common.Responsible"]</dt>
+            <dd>@(Model.Responsavel?.Email ?? T["Common.NoResponsible"])</dd>
+        </dl>
+    </section>
+
+    <section class="dashboard-panel grid-span-5">
+        <div class="panel-header">
+            <h2>@(T.IsEnglish ? "Financial summary" : "Resumo financeiro")</h2>
+        </div>
+        <div class="metric-row"><span>@T["Common.PurchaseValue"]</span><strong>@Model.ValorCompra.ToString("C")</strong></div>
+        <div class="metric-row"><span>@(T.IsEnglish ? "Purchase date" : "Data de compra")</span><strong>@Model.DataCompra.ToShortDateString()</strong></div>
+        <div class="metric-row"><span>@T["Common.CurrentValue"]</span><strong class="text-success">@Model.ValorAtual.ToString("C")</strong></div>
+        <div class="metric-row"><span>@(T.IsEnglish ? "Depreciation" : "Depreciacao")</span><strong class="text-danger">@((Model.ValorCompra - Model.ValorAtual).ToString("C"))</strong></div>
+    </section>
+
+    <section class="dashboard-panel grid-span-12">
+        <div class="panel-header">
+            <h2><i class="bi bi-clock-history me-1"></i>@(T.IsEnglish ? "Movement history" : "Historico de movimentacoes")</h2>
+        </div>
+
+        @if (Model.Historicos != null && Model.Historicos.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>@(T.IsEnglish ? "Date/time" : "Data/hora")</th>
+                            <th>@(T.IsEnglish ? "User" : "Usuario")</th>
+                            <th>@(T.IsEnglish ? "Action" : "Acao")</th>
+                            <th>@(T.IsEnglish ? "Details" : "Detalhes")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Historicos.OrderByDescending(h => h.DataAcao))
+                        {
+                            <tr>
+                                <td>@item.DataAcao.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@(string.IsNullOrEmpty(item.Usuario) ? "Sistema" : item.Usuario)</td>
+                                <td><span class="badge bg-secondary">@item.TipoAcao</span></td>
+                                <td>@item.Descricao</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-light text-center border mb-0">
+                <span class="text-muted">@(T.IsEnglish ? "No history has been recorded for this asset yet." : "Nenhum historico registrado para este ativo ainda.")</span>
+            </div>
+        }
+    </section>
 </div>

@@ -126,6 +126,41 @@ body {
 .metric-row { display: flex; justify-content: space-between; gap: 1rem; padding: .75rem; background: var(--app-surface-muted); border-radius: 8px; }
 .metric-row strong { font-size: 1.1rem; }
 
+.filter-panel {
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface-muted);
+  padding: 1rem;
+}
+
+.form-shell { max-width: 920px; }
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--app-text);
+  border-bottom: 1px solid var(--app-border);
+  margin: 1.5rem 0 1rem;
+  padding-bottom: .5rem;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: 1.5rem;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  gap: .85rem 1rem;
+  margin: 0;
+}
+
+.detail-list dt { color: var(--app-muted); font-weight: 700; }
+.detail-list dd { margin: 0; color: var(--app-text); }
+
 .privacy-section { max-width: 980px; margin: 0 auto; }
 .privacy-section h2 { font-size: 1.15rem; margin-top: 1.5rem; }
 
@@ -134,6 +169,7 @@ body {
 @media (max-width: 991px) {
   .dashboard-hero { align-items: flex-start; flex-direction: column; }
   .kpi-card, .grid-span-4, .grid-span-5, .grid-span-6, .grid-span-7, .grid-span-8 { grid-column: span 12; }
+  .detail-list { grid-template-columns: 1fr; }
 }
 
 @media (min-width: 992px) and (max-width: 1199px) {

@@ -1,49 +1,58 @@
 @model IEnumerable<GerenciadorAtivos.Models.ViewModels.UserRoleViewModel>
 @using Microsoft.AspNetCore.Mvc.Rendering
+@inject IUiTextService T
 
 @{
-    ViewData["Title"] = "Usuários";
+    ViewData["Title"] = T["Nav.Users"];
 }
 
-<h1>Usuários</h1>
+<section class="dashboard-hero">
+    <div>
+        <span class="eyebrow">@T["Nav.Users"]</span>
+        <h1 class="dashboard-title">@(T.IsEnglish ? "User management" : "Gestao de usuarios")</h1>
+        <p class="dashboard-subtitle">@(T.IsEnglish ? "Review accounts and assign access profiles." : "Revise contas e atribua perfis de acesso.")</p>
+    </div>
+</section>
 
 @if (TempData["StatusMessage"] is string statusMessage)
 {
     <div class="alert alert-success">@statusMessage</div>
 }
 
-<div class="table-responsive">
-    <table class="table table-hover align-middle">
-        <thead class="thead-azul">
-            <tr>
-                <th>E-mail</th>
-                <th>Perfil atual</th>
-                <th>Novo perfil</th>
-                <th class="text-end">Ação</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var usuario in Model)
-            {
+<div class="app-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="thead-azul">
                 <tr>
-                    <td>@usuario.Email</td>
-                    <td><span class="badge bg-primary">@usuario.CurrentRole</span></td>
-                    <td>
-                        <form id="role-form-@usuario.UserId" asp-action="UpdateRole" method="post" class="d-flex gap-2 justify-content-end">
-                            <input type="hidden" name="userId" value="@usuario.UserId" />
-                            <select name="selectedRole" class="form-select form-select-sm w-auto">
-                                @foreach (var role in (IEnumerable<SelectListItem>)ViewBag.Roles)
-                                {
-                                    <option value="@role.Value" selected="@(role.Value == usuario.SelectedRole)">@role.Text</option>
-                                }
-                            </select>
-                        </form>
-                    </td>
-                    <td class="text-end">
-                        <button type="submit" form="role-form-@usuario.UserId" class="btn btn-sm btn-outline-primary">Salvar</button>
-                    </td>
+                    <th>E-mail</th>
+                    <th>@(T.IsEnglish ? "Current role" : "Perfil atual")</th>
+                    <th>@(T.IsEnglish ? "New role" : "Novo perfil")</th>
+                    <th class="text-end">@(T.IsEnglish ? "Action" : "Acao")</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var usuario in Model)
+                {
+                    <tr>
+                        <td>@usuario.Email</td>
+                        <td><span class="badge bg-primary">@usuario.CurrentRole</span></td>
+                        <td>
+                            <form id="role-form-@usuario.UserId" asp-action="UpdateRole" method="post" class="d-flex gap-2 justify-content-end">
+                                <input type="hidden" name="userId" value="@usuario.UserId" />
+                                <select name="selectedRole" class="form-select form-select-sm w-auto">
+                                    @foreach (var role in (IEnumerable<SelectListItem>)ViewBag.Roles)
+                                    {
+                                        <option value="@role.Value" selected="@(role.Value == usuario.SelectedRole)">@role.Text</option>
+                                    }
+                                </select>
+                            </form>
+                        </td>
+                        <td class="text-end">
+                            <button type="submit" form="role-form-@usuario.UserId" class="btn btn-sm btn-outline-primary">@(T.IsEnglish ? "Save" : "Salvar")</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
