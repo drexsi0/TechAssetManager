@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace GerenciadorAtivos.Areas.Identity.Pages.Account
 {
@@ -116,7 +117,10 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    var message = CultureInfo.CurrentUICulture.Name.StartsWith("en")
+                        ? "Invalid login attempt."
+                        : "Tentativa de login inválida.";
+                    ModelState.AddModelError(string.Empty, message);
                     return Page();
                 }
             }

@@ -1,10 +1,11 @@
 ﻿@page
 @model AccessDeniedModel
+@inject IUiTextService T
 @{
-    ViewData["Title"] = "Acesso Negado";
+    ViewData["Title"] = T.IsEnglish ? "Access denied" : "Acesso negado";
 }
 
-<header>
+<section class="app-card dashboard-panel">
     <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">Você não tem permissão para acessar esse recurso.</p>
-</header>
+    <p class="text-danger mb-0">@(T.IsEnglish ? "You do not have permission to access this resource." : "Você não tem permissão para acessar este recurso.")</p>
+</section>

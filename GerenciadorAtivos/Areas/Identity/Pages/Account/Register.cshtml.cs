@@ -140,18 +140,32 @@ namespace GerenciadorAtivos.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirme sua conta - TechAsset Manager",
+                        var isEnglish = System.Globalization.CultureInfo.CurrentUICulture.Name.StartsWith("en");
+                        var subject = isEnglish ? "Confirm your account - TechAsset Manager" : "Confirme sua conta - TechAsset Manager";
+                        var greeting = isEnglish ? "Welcome to TechAsset Manager!" : "Bem-vindo ao TechAsset Manager!";
+                        var intro = isEnglish
+                            ? "Thanks for registering. To keep your account secure, confirm your e-mail address using the button below."
+                            : "Obrigado por se cadastrar. Para manter sua conta segura, confirme seu endereço de e-mail pelo botão abaixo.";
+                        var button = isEnglish ? "Confirm my e-mail" : "Confirmar meu e-mail";
+                        var fallback = isEnglish
+                            ? "If the button does not work, copy and paste this link into your browser:"
+                            : "Se o botão não funcionar, copie e cole este link no navegador:";
+                        var footer = isEnglish
+                            ? "This is an automated message. Please do not reply."
+                            : "Este é um e-mail automático. Por favor, não responda.";
+
+                        await _emailSender.SendEmailAsync(Input.Email, subject,
                             $"<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;'>" +
-                            $"<h2 style='color: #0056b3; text-align: center;'>Bem-vindo ao TechAsset Manager!</h2>" +
-                            $"<p style='font-size: 16px; color: #333;'>Olá,</p>" +
-                            $"<p style='font-size: 16px; color: #333; line-height: 1.5;'>Obrigado por se cadastrar na nossa plataforma. Para garantir a segurança da sua conta, por favor, confirme o seu endereço de e-mail clicando no botão abaixo:</p>" +
+                            $"<h2 style='color: #0056b3; text-align: center;'>{greeting}</h2>" +
+                            $"<p style='font-size: 16px; color: #333;'>{(isEnglish ? "Hello," : "Olá,")}</p>" +
+                            $"<p style='font-size: 16px; color: #333; line-height: 1.5;'>{intro}</p>" +
                             $"<div style='text-align: center; margin: 30px 0;'>" +
-                            $"<a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='background-color: #0056b3; color: white; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 5px; display: inline-block; font-weight: bold;'>Confirmar Meu E-mail</a>" +
+                            $"<a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='background-color: #0056b3; color: white; padding: 12px 24px; text-decoration: none; font-size: 16px; border-radius: 5px; display: inline-block; font-weight: bold;'>{button}</a>" +
                             $"</div>" +
-                            $"<p style='font-size: 14px; color: #777; line-height: 1.5;'>Se o botão acima não funcionar, você também pode copiar e colar o seguinte link no seu navegador:<br>" +
+                            $"<p style='font-size: 14px; color: #777; line-height: 1.5;'>{fallback}<br>" +
                             $"<a href='{HtmlEncoder.Default.Encode(callbackUrl)}' style='color: #0056b3;'>{callbackUrl}</a></p>" +
                             $"<hr style='border: 0; border-top: 1px solid #e0e0e0; margin: 20px 0;'>" +
-                            $"<p style='font-size: 12px; color: #999; text-align: center;'>Este é um e-mail automático enviado pelo sistema. Por favor, não responda a esta mensagem.</p>" +
+                            $"<p style='font-size: 12px; color: #999; text-align: center;'>{footer}</p>" +
                             $"</div>");
 
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)

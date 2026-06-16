@@ -1,15 +1,16 @@
 ﻿@page
 @model LoginModel
+@inject IUiTextService T
 
 @{
-    ViewData["Title"] = "Entrar";
+    ViewData["Title"] = T.IsEnglish ? "Sign in" : "Entrar";
 }
 
 <div class="row justify-content-center">
     <div class="col-md-4">
-        <section>
+        <section class="app-card dashboard-panel">
             <form id="account" method="post">
-                <h2 class="text-center">Bem-vindo de volta!</h2>
+                <h2 class="text-center">@(T.IsEnglish ? "Welcome back!" : "Bem-vindo de volta!")</h2>
                 <hr />
 
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
@@ -21,7 +22,7 @@
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Senha" />
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="@(T.IsEnglish ? "Password" : "Senha")" />
                     <label asp-for="Input.Password" class="form-label"></label>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
@@ -33,17 +34,11 @@
                     </label>
                 </div>
 
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Entrar</button>
-                </div>
+                <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">@(T.IsEnglish ? "Sign in" : "Entrar")</button>
 
                 <div class="mt-3 text-center">
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Esqueceu sua senha?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Cadastrar novo usuário</a>
-                    </p>
+                    <p><a id="forgot-password" asp-page="./ForgotPassword">@(T.IsEnglish ? "Forgot your password?" : "Esqueceu sua senha?")</a></p>
+                    <p><a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">@(T.IsEnglish ? "Create a new account" : "Cadastrar novo usuário")</a></p>
                 </div>
             </form>
         </section>

@@ -1,28 +1,30 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using GerenciadorAtivos.Services
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@inject IUiTextService T
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
         <li class="nav-item">
-            <a id="manage" class="nav-link text-white" asp-area="Identity" asp-page="/Account/Manage/Index" title="Gerenciar">
-                Olá, <b>@UserManager.GetUserName(User)</b>!
+            <a id="manage" class="nav-link text-white" asp-area="Identity" asp-page="/Account/Manage/Index" title="@(T.IsEnglish ? "Manage account" : "Gerenciar conta")">
+                @(T.IsEnglish ? "Hello" : "Olá"), <b>@UserManager.GetUserName(User)</b>!
             </a>
         </li>
         <li class="nav-item">
             <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button id="logout" type="submit" class="nav-link btn btn-link text-white border-0">Sair</button>
+                <button id="logout" type="submit" class="nav-link btn btn-link text-white border-0">@(T.IsEnglish ? "Sign out" : "Sair")</button>
             </form>
         </li>
     }
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-white" id="register" asp-area="Identity" asp-page="/Account/Register">Cadastrar</a>
+            <a class="nav-link text-white" id="register" asp-area="Identity" asp-page="/Account/Register">@(T.IsEnglish ? "Register" : "Cadastrar")</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-white" id="login" asp-area="Identity" asp-page="/Account/Login">Entrar</a>
+            <a class="nav-link text-white" id="login" asp-area="Identity" asp-page="/Account/Login">@(T.IsEnglish ? "Sign in" : "Entrar")</a>
         </li>
     }
 </ul>

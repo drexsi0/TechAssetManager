@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using GerenciadorAtivos.Services;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,10 +41,21 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 })
 .AddRoles<IdentityRole>()
+.AddErrorDescriber<IdentityMensagensPortugues>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IUiTextService, UiTextService>();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddLocalization();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.SlidingExpiration = true;
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -64,17 +77,28 @@ builder.Services.AddRateLimiter(options =>
 var app = builder.Build();
 
 app.UseRateLimiter();
+QuestPDF.Settings.License = LicenseType.Community;
 
 // --- FORÃ‡A O SISTEMA A USAR O PADRÃƒO BRASILEIRO (R$, Datas, etc) ---
 var defaultCulture = new CultureInfo("pt-BR");
 var localizationOptions = new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture(defaultCulture),
-    SupportedCultures = new List<CultureInfo> { defaultCulture },
-    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+    SupportedCultures = new List<CultureInfo> { defaultCulture, new("en-US") },
+    SupportedUICultures = new List<CultureInfo> { defaultCulture, new("en-US") }
 };
+localizationOptions.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
 app.UseRequestLocalization(localizationOptions);
 // -------------------------------------------------------------------
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.TryAdd("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.TryAdd("X-Frame-Options", "DENY");
+    context.Response.Headers.TryAdd("Referrer-Policy", "strict-origin-when-cross-origin");
+    context.Response.Headers.TryAdd("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    await next();
+});
 
 // --- MIGRAÃ‡ÃƒO AUTOMÃTICA (CRIA O BANCO NA NUVEM) ---
 using (var scope = app.Services.CreateScope())

@@ -1,6 +1,7 @@
 ﻿using GerenciadorAtivos.Data;
 using GerenciadorAtivos.Models;
 using GerenciadorAtivos.Models.ViewModels;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -66,6 +67,24 @@ namespace GerenciadorAtivos.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SetCulture(string culture, string returnUrl)
+        {
+            var safeCulture = culture == "en-US" ? "en-US" : "pt-BR";
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(safeCulture)),
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddYears(1),
+                    SameSite = SameSiteMode.Lax,
+                    IsEssential = true
+                });
+
+            return LocalRedirect(string.IsNullOrWhiteSpace(returnUrl) ? Url.Content("~/") : returnUrl);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

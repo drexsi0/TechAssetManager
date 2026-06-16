@@ -1,60 +1,84 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using System.Globalization
+@inject IUiTextService T
+@{
+    var isEnglish = T.IsEnglish;
+    var returnUrl = Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString;
+}
+<!DOCTYPE html>
+<html lang="@(isEnglish ? "en" : "pt-BR")" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - GerenciadorAtivos</title>
+    <title>@ViewData["Title"] - TechAsset Manager</title>
+    <script>
+        (() => {
+            const theme = localStorage.getItem('techasset-theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GerenciadorAtivos.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark border-bottom box-shadow mb-3" style="background-color: #004aad;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark app-navbar border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TechAsset Manager</a>
+                <a class="navbar-brand fw-semibold" asp-area="" asp-controller="Home" asp-action="Index">TechAsset Manager</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="@(isEnglish ? "Toggle navigation" : "Alternar navegação")">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Início</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-1"></i>@T["Nav.Home"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Ativos" asp-action="Index">
-                                <i class="bi bi-box-seam-fill"></i> Inventário
-                            </a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Ativos" asp-action="Index"><i class="bi bi-box-seam-fill me-1"></i>@T["Nav.Inventory"]</a>
                         </li>
                         @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Historico" asp-action="Index">Auditoria</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Historico" asp-action="Index"><i class="bi bi-clock-history me-1"></i>@T["Nav.Audit"]</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Relatorios" asp-action="Index">Relatórios</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Relatorios" asp-action="Index"><i class="bi bi-file-earmark-bar-graph me-1"></i>@T["Nav.Reports"]</a>
                             </li>
                         }
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Usuarios" asp-action="Index">Usuários</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Usuarios" asp-action="Index"><i class="bi bi-people me-1"></i>@T["Nav.Users"]</a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy"><i class="bi bi-shield-check me-1"></i>@T["Nav.Privacy"]</a>
                         </li>
                     </ul>
 
-                    <partial name="_LoginPartial" />
+                    <div class="d-flex align-items-center gap-2 me-sm-3 mt-2 mt-sm-0">
+                        <form asp-controller="Home" asp-action="SetCulture" method="post" class="m-0">
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <select name="culture" class="form-select form-select-sm nav-control" onchange="this.form.submit()" aria-label="@T["Nav.Language"]">
+                                <option value="pt-BR" selected="@(!isEnglish)">PT-BR</option>
+                                <option value="en-US" selected="@(isEnglish)">EN</option>
+                            </select>
+                        </form>
+                        <button type="button" id="themeToggle" class="btn btn-sm btn-outline-light theme-toggle" aria-label="@T["Nav.Theme"]" title="@T["Nav.Theme"]">
+                            <span class="theme-icon-light"><i class="bi bi-sun"></i></span>
+                            <span class="theme-icon-dark"><i class="bi bi-moon-stars"></i></span>
+                        </button>
+                    </div>
 
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container app-shell">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -62,7 +86,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; @DateTime.Now.Year - TechAsset Manager - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
+            &copy; @DateTime.Now.Year - TechAsset Manager - <a asp-area="" asp-controller="Home" asp-action="Privacy">@T["Nav.Privacy"]</a>
             <span class="float-end">Versão 1.1.0</span>
         </div>
     </footer>

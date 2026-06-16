@@ -1,4 +1,24 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿(() => {
+    const storageKey = 'techasset-theme';
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
 
-// Write your JavaScript code.
+    const applyTheme = (theme) => {
+        const safeTheme = theme === 'dark' ? 'dark' : 'light';
+        root.setAttribute('data-bs-theme', safeTheme);
+        localStorage.setItem(storageKey, safeTheme);
+        if (toggle) {
+            toggle.setAttribute('aria-pressed', safeTheme === 'dark' ? 'true' : 'false');
+        }
+        window.dispatchEvent(new CustomEvent('techasset:themechanged', { detail: { theme: safeTheme } }));
+    };
+
+    applyTheme(localStorage.getItem(storageKey) || 'light');
+
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+            const currentTheme = root.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+    }
+})();
