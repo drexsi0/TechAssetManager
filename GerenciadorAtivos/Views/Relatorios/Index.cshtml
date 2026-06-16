@@ -1,41 +1,39 @@
-﻿@{
-    ViewData["Title"] = "Central de Relatórios";
+﻿@inject IUiTextService T
+@{
+    ViewData["Title"] = T["Reports.Title"];
 }
 
-<div class="text-center mb-5">
-    <h1 class="display-5">Relatórios Gerenciais</h1>
-    <p class="text-muted">Exporte dados para análise externa</p>
-</div>
+<section class="dashboard-hero">
+    <div>
+        <h1 class="dashboard-title">@T["Reports.Title"]</h1>
+        <p class="dashboard-subtitle">@T["Reports.Subtitle"]</p>
+    </div>
+</section>
 
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow hover-effect">
-            <div class="card-body text-center p-5">
-                <i class="bi bi-file-earmark-excel text-success display-1 mb-3"></i>
-                <h3 class="card-title">Relatório Geral de Ativos</h3>
-                <p class="card-text text-muted">
-                    Exporta lista completa de ativos cadastrados no formato .xlsx (Excel).
-                    Inclui status, setor e detalhes técnicos.
-                </p>
-                <a asp-action="ExportarAtivosExcel" class="btn btn-success btn-lg mt-3">
-                    <i class="bi bi-download"></i> Baixar Excel
+<div class="dashboard-grid">
+    <article class="app-card dashboard-panel grid-span-6">
+        <div class="d-flex align-items-start gap-3">
+            <span class="kpi-icon text-success"><i class="bi bi-file-earmark-excel fs-4"></i></span>
+            <div>
+                <h2 class="mb-2">@T["Reports.ExcelTitle"]</h2>
+                <p class="text-muted mb-3">@T["Reports.ExcelDescription"]</p>
+                <a asp-action="ExportarAtivosExcel" class="btn btn-success">
+                    <i class="bi bi-download me-1"></i>@T["Reports.ExcelButton"]
                 </a>
             </div>
         </div>
-    </div>
+    </article>
 
-    <div class="col-md-5">
-        <div class="card shadow hover-effect border-light">
-            <div class="card-body text-center p-5 opacity-50">
-                <i class="bi bi-file-earmark-pdf text-danger display-1 mb-3"></i>
-                <h3 class="card-title">Relatório em PDF</h3>
-                <p class="card-text text-muted">
-                    Ficha técnica detalhada para impressão e assinatura.
-                </p>
-                <button class="btn btn-secondary btn-lg mt-3" disabled>
-                    Em Breve
-                </button>
+    <article class="app-card dashboard-panel grid-span-6">
+        <div class="d-flex align-items-start gap-3">
+            <span class="kpi-icon text-danger"><i class="bi bi-file-earmark-pdf fs-4"></i></span>
+            <div>
+                <h2 class="mb-2">@T["Reports.PdfTitle"]</h2>
+                <p class="text-muted mb-3">@T["Reports.PdfDescription"]</p>
+                <a asp-action="ExportarAtivosPdf" class="btn btn-danger">
+                    <i class="bi bi-download me-1"></i>@T["Reports.PdfButton"]
+                </a>
             </div>
         </div>
-    </div>
+    </article>
 </div>
