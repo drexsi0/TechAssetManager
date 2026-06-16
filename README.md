@@ -50,6 +50,7 @@ O TechAsset Manager centraliza o cadastro de ativos, permite acompanhar status e
 - Busca, filtros combinados e paginação server-side.
 - Exportação de relatório em Excel com ClosedXML.
 - Exportação de relatório executivo em PDF com QuestPDF.
+- Exportação do log de auditoria em TXT respeitando os filtros aplicados.
 - Interface em PT-BR e EN-US com seletor persistido por cookie de cultura.
 - Modo claro/escuro com preferência salva no navegador.
 - Página de privacidade alinhada ao propósito do sistema e ao contexto LGPD.
