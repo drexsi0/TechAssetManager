@@ -23,7 +23,7 @@
 </section>
 
 <div class="dashboard-grid">
-    <section class="dashboard-panel grid-span-7">
+    <section class="app-card dashboard-panel grid-span-7">
         <div class="panel-header">
             <h2>@(T.IsEnglish ? "Asset data" : "Dados do ativo")</h2>
         </div>
@@ -45,7 +45,7 @@
         </dl>
     </section>
 
-    <section class="dashboard-panel grid-span-5">
+    <section class="app-card dashboard-panel grid-span-5">
         <div class="panel-header">
             <h2>@(T.IsEnglish ? "Financial summary" : "Resumo financeiro")</h2>
         </div>
@@ -55,7 +55,7 @@
         <div class="metric-row"><span>@(T.IsEnglish ? "Depreciation" : "Depreciação")</span><strong class="text-danger">@((Model.ValorCompra - Model.ValorAtual).ToString("C"))</strong></div>
     </section>
 
-    <section class="dashboard-panel grid-span-12">
+    <section class="app-card dashboard-panel grid-span-12">
         <div class="panel-header">
             <h2><i class="bi bi-clock-history me-1"></i>@(T.IsEnglish ? "Movement history" : "Histórico de movimentações")</h2>
         </div>

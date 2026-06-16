@@ -44,11 +44,10 @@
     }
 </section>
 
-<div class="app-card mb-4">
+<div class="app-card filter-card mb-4">
     <form asp-action="Index" method="get">
-        <div class="row g-3 align-items-center">
-            <div class="col-lg-5">
-                <div class="input-group">
+        <div class="inventory-toolbar">
+            <div class="input-group inventory-search">
                     <input type="text" name="searchString" class="form-control" placeholder="@(T.IsEnglish ? "Name or asset tag..." : "Nome ou patrimônio...")" value="@ViewData["CurrentFilter"]">
                     <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>@(T.IsEnglish ? "Search" : "Buscar")</button>
                     @if (hasFilters)
@@ -57,14 +56,12 @@
                             <i class="bi bi-x-lg"></i>
                         </a>
                     }
-                </div>
             </div>
 
-            <div class="col-lg-7 text-lg-end">
-                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados" aria-expanded="false">
+            <div>
+                <button class="btn btn-outline-secondary inventory-filter-button" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados" aria-expanded="false">
                     <i class="bi bi-funnel me-1"></i>@(T.IsEnglish ? "Advanced filters" : "Filtros avançados")
                 </button>
-            </div>
         </div>
 
         <div class="collapse mt-3 @(hasFilters ? "show" : "")" id="filtrosAvancados">
@@ -97,7 +94,7 @@
     </form>
 </div>
 
-<div class="app-card">
+<div class="app-card table-card inventory-table-card">
     <div class="table-responsive">
         <table class="table table-hover table-striped align-middle mb-0">
             <thead class="thead-azul">

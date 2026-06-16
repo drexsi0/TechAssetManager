@@ -32,30 +32,30 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav flex-grow-1 nav-divider-list">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-1"></i>@T["Nav.Home"]</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">@T["Nav.Home"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Ativos" asp-action="Index"><i class="bi bi-box-seam-fill me-1"></i>@T["Nav.Inventory"]</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Ativos" asp-action="Index">@T["Nav.Inventory"]</a>
                         </li>
                         @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Historico" asp-action="Index"><i class="bi bi-clock-history me-1"></i>@T["Nav.Audit"]</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Historico" asp-action="Index">@T["Nav.Audit"]</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Relatorios" asp-action="Index"><i class="bi bi-file-earmark-bar-graph me-1"></i>@T["Nav.Reports"]</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Relatorios" asp-action="Index">@T["Nav.Reports"]</a>
                             </li>
                         }
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Usuarios" asp-action="Index"><i class="bi bi-people me-1"></i>@T["Nav.Users"]</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="Usuarios" asp-action="Index">@T["Nav.Users"]</a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy"><i class="bi bi-shield-check me-1"></i>@T["Nav.Privacy"]</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">@T["Nav.Privacy"]</a>
                         </li>
                     </ul>
 
