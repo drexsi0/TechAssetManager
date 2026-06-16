@@ -1,7 +1,59 @@
-﻿@{
-    ViewData["Title"] = "Política de Privacidade";
+﻿@inject IUiTextService T
+@{
+    ViewData["Title"] = T["Privacy.Title"];
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use esta página para detalhar a política de privacidade do site da sua empresa.</p>
-<p>Todos os dados inseridos neste sistema são de propriedade da <strong>TechAsset Manager</strong> e protegidos conforme a LGPD.</p>
+<section class="privacy-section app-card dashboard-panel">
+    @if (T.IsEnglish)
+    {
+        <h1 class="dashboard-title mb-2">Privacy policy</h1>
+        <p class="text-muted">This page explains how TechAsset Manager handles information inside the IT asset management system.</p>
+
+        <h2>Purpose</h2>
+        <p>TechAsset Manager is used to register, monitor and audit IT assets such as notebooks, desktops, monitors, peripherals and servers.</p>
+
+        <h2>Data processed</h2>
+        <p>The system stores asset information, operational status, sector, purchase values, responsible users and audit events. Account data is limited to authentication and authorization needs.</p>
+
+        <h2>Legal and operational basis</h2>
+        <p>Data is processed for inventory control, accountability, security and operational traceability. The project follows LGPD-oriented principles of minimization, transparency and access control.</p>
+
+        <h2>Security</h2>
+        <p>Access is protected by ASP.NET Core Identity, role-based authorization, password policies, lockout, HTTPS in production and optional two-factor authentication.</p>
+
+        <h2>Retention</h2>
+        <p>Assets use logical deletion to preserve audit history. Personal data can be reviewed in the account management area according to the user's permission level.</p>
+
+        <h2>Cookies</h2>
+        <p>The application uses technical cookies for authentication, language preference and interface theme. These cookies are necessary for normal system operation.</p>
+
+        <h2>Demo environment</h2>
+        <p>If demo mode is enabled, e-mail confirmation may be automated to reduce friction for portfolio evaluation. This behavior is not intended for production environments.</p>
+    }
+    else
+    {
+        <h1 class="dashboard-title mb-2">Política de privacidade</h1>
+        <p class="text-muted">Esta página explica como o TechAsset Manager trata informações dentro do sistema de gestão de ativos de TI.</p>
+
+        <h2>Finalidade</h2>
+        <p>O TechAsset Manager é utilizado para cadastrar, monitorar e auditar ativos de TI, como notebooks, desktops, monitores, periféricos e servidores.</p>
+
+        <h2>Dados tratados</h2>
+        <p>O sistema armazena informações dos ativos, status operacional, setor, valores de compra, usuários responsáveis e eventos de auditoria. Dados de conta são limitados ao necessário para autenticação e autorização.</p>
+
+        <h2>Base operacional e LGPD</h2>
+        <p>Os dados são tratados para controle de inventário, responsabilização, segurança e rastreabilidade operacional. O projeto segue princípios alinhados à LGPD, como minimização, transparência e controle de acesso.</p>
+
+        <h2>Segurança</h2>
+        <p>O acesso é protegido por ASP.NET Core Identity, autorização por perfis, políticas de senha, bloqueio por tentativas, HTTPS em produção e autenticação em dois fatores opcional.</p>
+
+        <h2>Retenção</h2>
+        <p>Ativos usam exclusão lógica para preservar o histórico de auditoria. Dados pessoais podem ser consultados na área de gerenciamento de conta conforme o nível de permissão do usuário.</p>
+
+        <h2>Cookies</h2>
+        <p>A aplicação usa cookies técnicos para autenticação, preferência de idioma e tema da interface. Esses cookies são necessários para o funcionamento normal do sistema.</p>
+
+        <h2>Ambiente de demonstração</h2>
+        <p>Se o modo demo estiver ativo, a confirmação de e-mail pode ser automatizada para reduzir atrito na avaliação do portfólio. Esse comportamento não é indicado para ambientes de produção.</p>
+    }
+</section>

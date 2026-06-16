@@ -1,129 +1,102 @@
 ﻿@using X.PagedList
 @using X.PagedList.Mvc.Core
 @model IPagedList<GerenciadorAtivos.Models.Historico>
+@inject IUiTextService T
 
 @{
-    ViewData["Title"] = "Auditoria";
+    ViewData["Title"] = T["Nav.Audit"];
+    var searchLabel = T.IsEnglish ? "Search" : "Buscar";
+    var actionType = T.IsEnglish ? "Action type" : "Tipo de ação";
+    var allActions = T.IsEnglish ? "All actions" : "Todas as ações";
+    var filter = T.IsEnglish ? "Filter" : "Filtrar";
+    var clear = T.IsEnglish ? "Clear" : "Limpar";
+    var relatedAsset = T.IsEnglish ? "Related asset" : "Ativo relacionado";
+    var details = T.IsEnglish ? "Details" : "Detalhes";
+    var deletedAsset = T.IsEnglish ? "Deleted asset" : "Ativo excluído";
+    var previous = T.IsEnglish ? "Previous" : "Anterior";
+    var next = T.IsEnglish ? "Next" : "Próximo";
+    var pageText = T.IsEnglish ? "Page" : "Página";
+    var ofText = T.IsEnglish ? "of" : "de";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h1><i class="bi bi-shield-lock"></i> Log de Auditoria</h1>
-        <p class="text-muted">Rastreabilidade completa das ações no sistema.</p>
+        <h1><i class="bi bi-shield-lock"></i> @(T.IsEnglish ? "Audit log" : "Log de auditoria")</h1>
+        <p class="text-muted">@(T.IsEnglish ? "Complete traceability of system actions." : "Rastreabilidade completa das ações no sistema.")</p>
     </div>
 </div>
 
-<div class="card mb-4 shadow-sm">
-    <div class="card-body">
-        <form asp-action="Index" method="get" class="row g-3 align-items-end">
-            <div class="col-md-5">
-                <label class="form-label">Buscar</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="searchString" class="form-control"
-                           placeholder="Usuário, Ativo ou Detalhes..."
-                           value="@ViewData["CurrentFilter"]">
-                </div>
+<div class="app-card dashboard-panel mb-4">
+    <form asp-action="Index" method="get" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label">@searchLabel</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" name="searchString" class="form-control" placeholder="@(T.IsEnglish ? "User, asset or details..." : "Usuário, ativo ou detalhes...")" value="@ViewData["CurrentFilter"]">
             </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Tipo de Ação</label>
-                <select name="tipoAcao" class="form-select">
-                    <option value="">Todas as Ações</option>
-                    <!option value="Criação" @(ViewData["TipoAcaoFilter"]?.ToString() == "Criação" ? "selected" : "")>Criação</!option>
-                    <!option value="Atualização" @(ViewData["TipoAcaoFilter"]?.ToString() == "Atualização" ? "selected" : "")>Atualização</!option>
-                    <!option value="Exclusão" @(ViewData["TipoAcaoFilter"]?.ToString() == "Exclusão" ? "selected" : "")>Exclusão</!option>
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-primary me-2">Filtrar</button>
-                @if (ViewData["CurrentFilter"] != null || ViewData["TipoAcaoFilter"] != null)
-                {
-                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
-                }
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="card shadow-sm border-0">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0 align-middle">
-                <thead class="thead-azul">
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Usuário</th>
-                        <th>Ação</th>
-                        <th>Ativo Relacionado</th>
-                        <th>Detalhes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td style="white-space: nowrap;">@item.DataAcao.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-person-circle fs-5 me-2 text-secondary"></i>
-                                    @item.Usuario
-                                </div>
-                            </td>
-                            <td>
-                                @{
-                                    var corBadge = "bg-secondary";
-                                    var icone = "bi-circle";
-                                    if (item.TipoAcao == "Criação") { corBadge = "bg-success"; icone = "bi-plus-circle"; }
-                                    else if (item.TipoAcao == "Atualização") { corBadge = "bg-primary"; icone = "bi-pencil"; }
-                                    else if (item.TipoAcao == "Exclusão") { corBadge = "bg-danger"; icone = "bi-trash"; }
-                                }
-                                <span class="badge @corBadge rounded-pill">
-                                    <i class="bi @icone me-1"></i> @item.TipoAcao
-                                </span>
-                            </td>
-                            <td>
-                                @if (item.Ativo != null)
-                                {
-                                    <a asp-controller="Ativos" asp-action="Details" asp-route-id="@item.AtivoId" class="text-decoration-none fw-bold text-dark">
-                                        @item.Ativo.Nome
-                                    </a>
-                                    <br />
-                                    <small class="text-muted">@item.Ativo.Patrimonio</small>
-                                }
-                                else
-                                {
-                                    <span class="text-muted fst-italic">Ativo Excluído</span>
-                                }
-                            </td>
-                            <td class="text-muted small">@item.Descricao</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
         </div>
+
+        <div class="col-md-3">
+            <label class="form-label">@actionType</label>
+            <select name="tipoAcao" class="form-select">
+                <option value="">@allActions</option>
+                <!option value="Criação" @(ViewData["TipoAcaoFilter"]?.ToString() == "Criação" ? "selected" : "")>@(T.IsEnglish ? "Creation" : "Criação")</!option>
+                <!option value="Atualização" @(ViewData["TipoAcaoFilter"]?.ToString() == "Atualização" ? "selected" : "")>@(T.IsEnglish ? "Update" : "Atualização")</!option>
+                <!option value="Exclusão" @(ViewData["TipoAcaoFilter"]?.ToString() == "Exclusão" ? "selected" : "")>@(T.IsEnglish ? "Deletion" : "Exclusão")</!option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary me-2">@filter</button>
+            @if (ViewData["CurrentFilter"] != null || ViewData["TipoAcaoFilter"] != null)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">@clear</a>
+            }
+        </div>
+    </form>
+</div>
+
+<div class="app-card">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0 align-middle">
+            <thead class="thead-azul">
+                <tr>
+                    <th>@(T.IsEnglish ? "Date/time" : "Data/Hora")</th>
+                    <th>@(T.IsEnglish ? "User" : "Usuário")</th>
+                    <th>@(T.IsEnglish ? "Action" : "Ação")</th>
+                    <th>@relatedAsset</th>
+                    <th>@details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td style="white-space: nowrap;">@item.DataAcao.ToString("g")</td>
+                        <td><i class="bi bi-person-circle fs-5 me-2 text-secondary"></i>@item.Usuario</td>
+                        <td><span class="badge bg-secondary rounded-pill">@item.TipoAcao</span></td>
+                        <td>
+                            @if (item.Ativo != null)
+                            {
+                                <a asp-controller="Ativos" asp-action="Details" asp-route-id="@item.AtivoId" class="text-decoration-none fw-bold text-body">@item.Ativo.Nome</a><br />
+                                <small class="text-muted">@item.Ativo.Patrimonio</small>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">@deletedAsset</span>
+                            }
+                        </td>
+                        <td class="text-muted small">@item.Descricao</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
 <div class="d-flex justify-content-center align-items-center mt-4 gap-3">
-    @{
-        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-    }
-    <a asp-action="Index"
-       asp-route-pageNumber="@(Model.PageNumber - 1)"
-       asp-route-searchString="@ViewData["CurrentFilter"]"
-       asp-route-tipoAcao="@ViewData["TipoAcaoFilter"]"
-       class="btn btn-outline-primary @prevDisabled">
-        &laquo; Anterior
-    </a>
-    <span class="fw-bold text-muted">Página @Model.PageNumber de @Model.PageCount</span>
-    <a asp-action="Index"
-       asp-route-pageNumber="@(Model.PageNumber + 1)"
-       asp-route-searchString="@ViewData["CurrentFilter"]"
-       asp-route-tipoAcao="@ViewData["TipoAcaoFilter"]"
-       class="btn btn-outline-primary @nextDisabled">
-        Próximo &raquo;
-    </a>
+    @{ var prevDisabled = !Model.HasPreviousPage ? "disabled" : ""; var nextDisabled = !Model.HasNextPage ? "disabled" : ""; }
+    <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-tipoAcao="@ViewData["TipoAcaoFilter"]" class="btn btn-outline-primary @prevDisabled">&laquo; @previous</a>
+    <span class="fw-bold text-muted">@pageText @Model.PageNumber @ofText @Model.PageCount</span>
+    <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-tipoAcao="@ViewData["TipoAcaoFilter"]" class="btn btn-outline-primary @nextDisabled">@next &raquo;</a>
 </div>
