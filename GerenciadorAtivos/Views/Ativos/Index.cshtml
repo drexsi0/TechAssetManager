@@ -35,7 +35,7 @@
 <section class="dashboard-hero">
     <div>
         <span class="eyebrow">@T["Nav.Inventory"]</span>
-        <h1 class="dashboard-title">@(T.IsEnglish ? "Asset inventory" : "Inventario de ativos")</h1>
+        <h1 class="dashboard-title">@(T.IsEnglish ? "Asset inventory" : "Inventário de ativos")</h1>
         <p class="dashboard-subtitle">@(T.IsEnglish ? "Search, filter and manage the assets registered in TechAsset." : "Pesquise, filtre e gerencie os ativos cadastrados no TechAsset.")</p>
     </div>
     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
@@ -49,7 +49,7 @@
         <div class="row g-3 align-items-center">
             <div class="col-lg-5">
                 <div class="input-group">
-                    <input type="text" name="searchString" class="form-control" placeholder="@(T.IsEnglish ? "Name or asset tag..." : "Nome ou patrimonio...")" value="@ViewData["CurrentFilter"]">
+                    <input type="text" name="searchString" class="form-control" placeholder="@(T.IsEnglish ? "Name or asset tag..." : "Nome ou patrimônio...")" value="@ViewData["CurrentFilter"]">
                     <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>@(T.IsEnglish ? "Search" : "Buscar")</button>
                     @if (hasFilters)
                     {
@@ -62,7 +62,7 @@
 
             <div class="col-lg-7 text-lg-end">
                 <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados" aria-expanded="false">
-                    <i class="bi bi-funnel me-1"></i>@(T.IsEnglish ? "Advanced filters" : "Filtros avancados")
+                    <i class="bi bi-funnel me-1"></i>@(T.IsEnglish ? "Advanced filters" : "Filtros avançados")
                 </button>
             </div>
         </div>
@@ -109,7 +109,7 @@
                     <th>@T["Common.Responsible"]</th>
                     <th>@T["Common.Status"]</th>
                     <th>@T["Common.CurrentValue"]</th>
-                    <th class="text-end">@(T.IsEnglish ? "Actions" : "Acoes")</th>
+                    <th class="text-end">@(T.IsEnglish ? "Actions" : "Ações")</th>
                 </tr>
             </thead>
             <tbody>
@@ -178,7 +178,7 @@
        class="btn btn-outline-primary @prevDisabled">
         &laquo; @(T.IsEnglish ? "Previous" : "Anterior")
     </a>
-    <span class="fw-bold text-muted">@(T.IsEnglish ? "Page" : "Pagina") @Model.PageNumber @(T.IsEnglish ? "of" : "de") @Model.PageCount</span>
+    <span class="fw-bold text-muted">@(T.IsEnglish ? "Page" : "Página") @Model.PageNumber @(T.IsEnglish ? "of" : "de") @Model.PageCount</span>
     <a asp-action="Index"
        asp-route-pageNumber="@(Model.PageNumber + 1)"
        asp-route-searchString="@ViewData["CurrentFilter"]"
@@ -186,6 +186,6 @@
        asp-route-setorFilter="@ViewData["SetorFilter"]"
        asp-route-tipoFilter="@ViewData["TipoFilter"]"
        class="btn btn-outline-primary @nextDisabled">
-        @(T.IsEnglish ? "Next" : "Proximo") &raquo;
+        @(T.IsEnglish ? "Next" : "Próximo") &raquo;
     </a>
 </div>

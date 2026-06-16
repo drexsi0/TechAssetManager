@@ -11,14 +11,14 @@
     <div>
         <span class="eyebrow">@T["Nav.Inventory"]</span>
         <h1 class="dashboard-title">@ViewData["Title"]</h1>
-        <p class="dashboard-subtitle text-danger">@(T.IsEnglish ? "Confirm the logical removal of this asset from the active inventory." : "Confirme a remocao logica deste ativo do inventario ativo.")</p>
+        <p class="dashboard-subtitle text-danger">@(T.IsEnglish ? "Confirm the logical removal of this asset from the active inventory." : "Confirme a remoção lógica deste ativo do inventário ativo.")</p>
     </div>
 </section>
 
 <div class="app-card">
     <div class="alert alert-warning">
         <i class="bi bi-exclamation-triangle me-1"></i>
-        @(T.IsEnglish ? "This asset will no longer appear in active inventory lists." : "Este ativo nao aparecera mais nas listas ativas do inventario.")
+        @(T.IsEnglish ? "This asset will no longer appear in active inventory lists." : "Este ativo não aparecerá mais nas listas ativas do inventário.")
     </div>
 
     <dl class="detail-list">
@@ -34,7 +34,7 @@
 
     <form asp-action="Delete" class="form-actions">
         <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-danger">@(T.IsEnglish ? "Confirm deletion" : "Confirmar exclusao")</button>
+        <button type="submit" class="btn btn-danger">@(T.IsEnglish ? "Confirm deletion" : "Confirmar exclusão")</button>
         <a asp-action="Index" class="btn btn-outline-secondary">@(T.IsEnglish ? "Cancel" : "Cancelar")</a>
     </form>
 </div>

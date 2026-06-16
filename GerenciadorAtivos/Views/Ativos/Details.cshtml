@@ -52,12 +52,12 @@
         <div class="metric-row"><span>@T["Common.PurchaseValue"]</span><strong>@Model.ValorCompra.ToString("C")</strong></div>
         <div class="metric-row"><span>@(T.IsEnglish ? "Purchase date" : "Data de compra")</span><strong>@Model.DataCompra.ToShortDateString()</strong></div>
         <div class="metric-row"><span>@T["Common.CurrentValue"]</span><strong class="text-success">@Model.ValorAtual.ToString("C")</strong></div>
-        <div class="metric-row"><span>@(T.IsEnglish ? "Depreciation" : "Depreciacao")</span><strong class="text-danger">@((Model.ValorCompra - Model.ValorAtual).ToString("C"))</strong></div>
+        <div class="metric-row"><span>@(T.IsEnglish ? "Depreciation" : "Depreciação")</span><strong class="text-danger">@((Model.ValorCompra - Model.ValorAtual).ToString("C"))</strong></div>
     </section>
 
     <section class="dashboard-panel grid-span-12">
         <div class="panel-header">
-            <h2><i class="bi bi-clock-history me-1"></i>@(T.IsEnglish ? "Movement history" : "Historico de movimentacoes")</h2>
+            <h2><i class="bi bi-clock-history me-1"></i>@(T.IsEnglish ? "Movement history" : "Histórico de movimentações")</h2>
         </div>
 
         @if (Model.Historicos != null && Model.Historicos.Any())
@@ -67,8 +67,8 @@
                     <thead>
                         <tr>
                             <th>@(T.IsEnglish ? "Date/time" : "Data/hora")</th>
-                            <th>@(T.IsEnglish ? "User" : "Usuario")</th>
-                            <th>@(T.IsEnglish ? "Action" : "Acao")</th>
+                            <th>@(T.IsEnglish ? "User" : "Usuário")</th>
+                            <th>@(T.IsEnglish ? "Action" : "Ação")</th>
                             <th>@(T.IsEnglish ? "Details" : "Detalhes")</th>
                         </tr>
                     </thead>
@@ -89,7 +89,7 @@
         else
         {
             <div class="alert alert-light text-center border mb-0">
-                <span class="text-muted">@(T.IsEnglish ? "No history has been recorded for this asset yet." : "Nenhum historico registrado para este ativo ainda.")</span>
+                <span class="text-muted">@(T.IsEnglish ? "No history has been recorded for this asset yet." : "Nenhum histórico registrado para este ativo ainda.")</span>
             </div>
         }
     </section>
