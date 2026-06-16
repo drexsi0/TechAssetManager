@@ -1,294 +1,198 @@
 ﻿@model GerenciadorAtivos.Models.ViewModels.DashboardViewModel
+@inject IUiTextService T
 
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = T["Dashboard.Title"];
 
-    // --- PROCESSAMENTO DE DADOS DO GRÁFICO DE SETOR ---
-    // Precisamos separar: O que mostramos (Nome) do que usamos no link (ID)
     var labelsSetor = new List<string>();
     var dataSetor = new List<int>();
-    var idsSetor = new List<string>(); // Guarda o ID "1", "2" para o redirecionamento
-
-    // Pega a lista oficial de nomes dos setores
+    var idsSetor = new List<string>();
     var listaSetores = Html.GetEnumSelectList<GerenciadorAtivos.Models.SetorAtivo>();
 
     foreach (var item in Model.AtivosPorSetor)
     {
-        // item.Key vem como "1", "2" (ID do banco)
-        // item.Value é a quantidade
-
-        // Tenta achar o nome bonito baseado no ID
-        var nomeBonito = listaSetores.FirstOrDefault(x => x.Value == item.Key)?.Text ?? item.Key;
-
-        labelsSetor.Add(nomeBonito); // Mostra "TI - Infraestrutura"
-        idsSetor.Add(item.Key);      // Guarda "2"
-        dataSetor.Add(item.Value);   // Guarda 5
+        var nome = listaSetores.FirstOrDefault(x => x.Value == item.Key)?.Text ?? item.Key;
+        labelsSetor.Add(nome);
+        idsSetor.Add(item.Key);
+        dataSetor.Add(item.Value);
     }
+
+    var depreciacao = Model.ValorTotalInvestido - Model.ValorTotalAtual;
+    var taxaUso = Model.TotalAtivos == 0 ? 0 : Math.Round((decimal)Model.EmUso / Model.TotalAtivos * 100, 1);
+    var taxaDisponibilidade = Model.TotalAtivos == 0 ? 0 : Math.Round((decimal)Model.Disponiveis / Model.TotalAtivos * 100, 1);
 }
 
-<div class="text-center mb-5">
-    <h1 class="display-4">Visão Geral</h1>
-    <p class="text-muted">Monitoramento de Ativos de TI em Tempo Real</p>
-</div>
+<section class="dashboard-hero">
+    <div>
+        <h1 class="dashboard-title">@T["Dashboard.Title"]</h1>
+        <p class="dashboard-subtitle">@T["Dashboard.Subtitle"]</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="Ativos" asp-action="Index" class="btn btn-primary"><i class="bi bi-box-seam me-1"></i>@T["Dashboard.ManageInventory"]</a>
+        <a asp-controller="Relatorios" asp-action="Index" class="btn btn-outline-primary"><i class="bi bi-download me-1"></i>@T["Dashboard.ExportReports"]</a>
+    </div>
+</section>
 
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card border-left-primary shadow h-100 py-2 border-0 border-start border-4 border-primary">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Investimento Total (Pago)
-                        </div>
-                        <div class="h3 mb-0 font-weight-bold text-gray-800">
-                            @Model.ValorTotalInvestido.ToString("C")
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-cash-coin fa-2x text-gray-300 display-4 text-primary opacity-50"></i>
-                    </div>
-                </div>
+<section class="dashboard-grid mb-3">
+    <article class="app-card kpi-card">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div class="kpi-label">@T["Dashboard.TotalAssets"]</div>
+                <div class="kpi-value">@Model.TotalAtivos</div>
             </div>
+            <span class="kpi-icon"><i class="bi bi-hdd-stack"></i></span>
         </div>
-    </div>
+        <div class="kpi-note">@T["Dashboard.Registered"]</div>
+    </article>
 
-    <div class="col-md-6">
-        <div class="card border-left-success shadow h-100 py-2 border-0 border-start border-4 border-success">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                            Valor Patrimonial Atual (Depreciado)
-                        </div>
-                        <div class="h3 mb-0 font-weight-bold text-gray-800">
-                            @Model.ValorTotalAtual.ToString("C")
-                        </div>
-                        <small class="text-danger">
-                            Perda de @((Model.ValorTotalInvestido - Model.ValorTotalAtual).ToString("C")) em depreciação
-                        </small>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-graph-down-arrow fa-2x text-gray-300 display-4 text-success opacity-50"></i>
-                    </div>
-                </div>
+    <article class="app-card kpi-card">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div class="kpi-label">@T["Dashboard.Available"]</div>
+                <div class="kpi-value text-success">@Model.Disponiveis</div>
             </div>
+            <span class="kpi-icon"><i class="bi bi-check2-circle"></i></span>
         </div>
-    </div>
-</div>
+        <div class="kpi-note">@T["Dashboard.InStock"] · @taxaDisponibilidade%</div>
+    </article>
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="card text-white bg-secondary mb-3 shadow">
-            <div class="card-header">Total de Ativos</div>
-            <div class="card-body">
-                <h2 class="card-title text-center">@Model.TotalAtivos</h2>
-                <p class="card-text text-center"><small>Cadastrados</small></p>
+    <article class="app-card kpi-card">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div class="kpi-label">@T["Dashboard.InUse"]</div>
+                <div class="kpi-value text-primary">@Model.EmUso</div>
             </div>
+            <span class="kpi-icon"><i class="bi bi-person-check"></i></span>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-success mb-3 shadow">
-            <div class="card-header">Disponíveis</div>
-            <div class="card-body">
-                <h2 class="card-title text-center">@Model.Disponiveis</h2>
-                <p class="card-text text-center"><small>No Estoque</small></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-primary mb-3 shadow">
-            <div class="card-header">Em Uso</div>
-            <div class="card-body">
-                <h2 class="card-title text-center">@Model.EmUso</h2>
-                <p class="card-text text-center"><small>Com Colaboradores</small></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-dark bg-warning mb-3 shadow">
-            <div class="card-header">Manutenção</div>
-            <div class="card-body">
-                <h2 class="card-title text-center">@Model.EmManutencao</h2>
-                <p class="card-text text-center"><small>Atenção Necessária</small></p>
-            </div>
-        </div>
-    </div>
-</div>
+        <div class="kpi-note">@T["Dashboard.WithUsers"] · @taxaUso%</div>
+    </article>
 
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Ativos por Setor</h6>
+    <article class="app-card kpi-card">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <div class="kpi-label">@T["Dashboard.Maintenance"]</div>
+                <div class="kpi-value text-warning">@Model.EmManutencao</div>
             </div>
-            <div class="card-body">
-                <div class="chart-bar">
-                    <canvas id="graficoSetor"></canvas>
-                </div>
-            </div>
+            <span class="kpi-icon"><i class="bi bi-tools"></i></span>
         </div>
-    </div>
+        <div class="kpi-note">@T["Dashboard.RequiresAttention"]</div>
+    </article>
+</section>
 
-    <div class="col-md-6">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Distribuição de Status</h6>
-            </div>                                                          
-            <div class="card-body">
-                <div class="chart-pie">
-                    <canvas id="graficoStatus"></canvas>
-                </div>
-            </div>
+<section class="dashboard-grid">
+    <article class="app-card dashboard-panel grid-span-4">
+        <div class="panel-header">
+            <h2>@T["Dashboard.InventoryHealth"]</h2>
+            <span class="badge text-bg-primary">@Model.TotalAtivos @T["Common.Assets"]</span>
         </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Ativos por Tipo</h6>
-            </div>
-            <div class="card-body">
-                <canvas id="graficoTipo"></canvas>
-            </div>
+        <div class="metric-list">
+            <div class="metric-row"><span>@T["Dashboard.TotalInvested"]</span><strong>@Model.ValorTotalInvestido.ToString("C")</strong></div>
+            <div class="metric-row"><span>@T["Dashboard.CurrentValue"]</span><strong>@Model.ValorTotalAtual.ToString("C")</strong></div>
+            <div class="metric-row"><span>@T["Dashboard.Depreciation"]</span><strong class="text-danger">@depreciacao.ToString("C")</strong></div>
         </div>
-    </div>
+    </article>
 
-    <div class="col-md-6">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Resumo Patrimonial</h6>
-            </div>
-            <div class="card-body">
-                <canvas id="graficoValor"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
+    <article class="app-card dashboard-panel grid-span-4">
+        <div class="panel-header"><h2>@T["Dashboard.ByStatus"]</h2></div>
+        <div class="chart-box compact"><canvas id="graficoStatus"></canvas></div>
+    </article>
 
-<div class="mt-4 text-center">
-    <a asp-controller="Ativos" asp-action="Index" class="btn btn-lg btn-outline-dark">
-        Gerenciar Inventário Completo &rarr;
-    </a>
-</div>
+    <article class="app-card dashboard-panel grid-span-4">
+        <div class="panel-header"><h2>@T["Dashboard.OperationalAlerts"]</h2></div>
+        @if (Model.EmManutencao > 0)
+        {
+            <div class="alert alert-warning mb-0"><i class="bi bi-exclamation-triangle me-1"></i>@Model.EmManutencao @T["Dashboard.Maintenance"].ToLower()</div>
+        }
+        else
+        {
+            <div class="alert alert-success mb-0"><i class="bi bi-check-circle me-1"></i>@T["Dashboard.NoAlerts"]</div>
+        }
+    </article>
+
+    <article class="app-card dashboard-panel grid-span-7">
+        <div class="panel-header"><h2>@T["Dashboard.BySector"]</h2></div>
+        <div class="chart-box"><canvas id="graficoSetor"></canvas></div>
+    </article>
+
+    <article class="app-card dashboard-panel grid-span-5">
+        <div class="panel-header"><h2>@T["Dashboard.ByType"]</h2></div>
+        <div class="chart-box"><canvas id="graficoTipo"></canvas></div>
+    </article>
+
+    <article class="app-card dashboard-panel grid-span-12">
+        <div class="panel-header"><h2>@T["Dashboard.ValueSummary"]</h2></div>
+        <div class="chart-box compact"><canvas id="graficoValor"></canvas></div>
+    </article>
+</section>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
-        // --- GRÁFICO DE SETOR (BARRAS) ---
-        var ctxSetor = document.getElementById('graficoSetor').getContext('2d');
+        const labelsSetor = @Html.Raw(Json.Serialize(labelsSetor));
+        const dataSetor = @Html.Raw(Json.Serialize(dataSetor));
+        const idsSetor = @Html.Raw(Json.Serialize(idsSetor));
+        const dadosStatus = @Html.Raw(Json.Serialize(Model.AtivosPorStatus));
+        const dadosTipo = @Html.Raw(Json.Serialize(Model.AtivosPorTipo));
+        const dadosValor = @Html.Raw(Json.Serialize(new[] { Model.ValorTotalInvestido, Model.ValorTotalAtual }));
+        const labelsValor = @Html.Raw(Json.Serialize(new[] { T["Common.Invested"], T["Common.Current"] }));
 
-        // Injetando os Arrays processados no C#
-        var labelsSetor = @Html.Raw(Json.Serialize(labelsSetor));
-        var dataSetor = @Html.Raw(Json.Serialize(dataSetor));
-        var idsSetor = @Html.Raw(Json.Serialize(idsSetor)); // Array oculto de IDs
+        let chartSetor, chartStatus, chartTipo, chartValor;
 
-        new Chart(ctxSetor, {
-            type: 'bar',
-            data: {
-                labels: labelsSetor, // Mostra o Nome (Ex: TI - Infra)
-                datasets: [{
-                    label: 'Quantidade',
-                    data: dataSetor,     // Mostra o Valor (Ex: 5)
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
+        function chartColors() {
+            const dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            return {
+                text: dark ? '#e8eef7' : '#172033',
+                grid: dark ? 'rgba(232,238,247,.12)' : 'rgba(23,32,51,.10)',
+                blue: dark ? '#6ea8fe' : '#0d6efd',
+                green: dark ? '#75b798' : '#198754',
+                yellow: dark ? '#ffda6a' : '#ffc107',
+                red: dark ? '#ea868f' : '#dc3545'
+            };
+        }
+
+        function baseOptions() {
+            const c = chartColors();
+            return {
                 responsive: true,
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-
-                // LÓGICA DE CLIQUE INTELIGENTE
-                onClick: (evt, activeElements) => {
-                    if (activeElements.length > 0) {
-                        const index = activeElements[0].index;
-
-                        // O Pulo do Gato: Pegamos o ID do array oculto, não o Label
-                        const setorId = idsSetor[index];
-
-                        // Redireciona enviando o ID ("2") que o filtro entende
-                        window.location.href = '/Ativos?setorFilter=' + encodeURIComponent(setorId);
-                    }
-                },
-                onHover: (event, chartElement) => {
-                    event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: c.text } } },
+                scales: {
+                    x: { ticks: { color: c.text }, grid: { color: c.grid } },
+                    y: { beginAtZero: true, ticks: { color: c.text, precision: 0 }, grid: { color: c.grid } }
                 }
-            }
-        });
+            };
+        }
 
-        // --- GRÁFICO DE STATUS (ROSCA) ---
-        // (Status geralmente já vem com o nome certo do Enum, mantemos a lógica padrão)
-        var ctxStatus = document.getElementById('graficoStatus').getContext('2d');
-        var dadosStatus = @Html.Raw(Json.Serialize(Model.AtivosPorStatus));
+        function renderCharts() {
+            [chartSetor, chartStatus, chartTipo, chartValor].forEach(chart => chart?.destroy());
+            const c = chartColors();
 
-        new Chart(ctxStatus, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(dadosStatus),
-                datasets: [{
-                    data: Object.values(dadosStatus),
-                    backgroundColor: ['#198754', '#0d6efd', '#ffc107', '#6c757d'],
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                onClick: (evt, activeElements) => {
-                    if (activeElements.length > 0) {
-                        const index = activeElements[0].index;
-                        const statusNome = Object.keys(dadosStatus)[index];
-                        window.location.href = '/Ativos?statusFilter=' + encodeURIComponent(statusNome);
-                    }
-                },
-                onHover: (event, chartElement) => {
-                    event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-                }
-            }
-        });
+            chartSetor = new Chart(document.getElementById('graficoSetor'), {
+                type: 'bar',
+                data: { labels: labelsSetor, datasets: [{ label: '@T["Common.Total"]', data: dataSetor, backgroundColor: c.blue + '99', borderColor: c.blue, borderWidth: 1 }] },
+                options: { ...baseOptions(), onClick: (_, active) => { if (active.length) window.location.href = '/Ativos?setorFilter=' + encodeURIComponent(idsSetor[active[0].index]); } }
+            });
 
-        var ctxTipo = document.getElementById('graficoTipo').getContext('2d');
-        var dadosTipo = @Html.Raw(Json.Serialize(Model.AtivosPorTipo));
+            chartStatus = new Chart(document.getElementById('graficoStatus'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(dadosStatus), datasets: [{ data: Object.values(dadosStatus), backgroundColor: [c.green, c.blue, c.yellow, c.red] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: c.text } } } }
+            });
 
-        new Chart(ctxTipo, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(dadosTipo),
-                datasets: [{
-                    label: 'Quantidade',
-                    data: Object.values(dadosTipo),
-                    backgroundColor: 'rgba(25, 135, 84, 0.65)',
-                    borderColor: 'rgba(25, 135, 84, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-            }
-        });
+            chartTipo = new Chart(document.getElementById('graficoTipo'), {
+                type: 'bar',
+                data: { labels: Object.keys(dadosTipo), datasets: [{ label: '@T["Common.Total"]', data: Object.values(dadosTipo), backgroundColor: c.green + '99', borderColor: c.green, borderWidth: 1 }] },
+                options: baseOptions()
+            });
 
-        var ctxValor = document.getElementById('graficoValor').getContext('2d');
-        var dadosValor = @Html.Raw(Json.Serialize(new[] { Model.ValorTotalInvestido, Model.ValorTotalAtual }));
-        new Chart(ctxValor, {
-            type: 'bar',
-            data: {
-                labels: ['Investido', 'Atual'],
-                datasets: [{
-                    label: 'Valor',
-                    data: dadosValor,
-                    backgroundColor: ['rgba(13, 110, 253, 0.65)', 'rgba(25, 135, 84, 0.65)'],
-                    borderColor: ['rgba(13, 110, 253, 1)', 'rgba(25, 135, 84, 1)'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
-            }
-        });
+            chartValor = new Chart(document.getElementById('graficoValor'), {
+                type: 'bar',
+                data: { labels: labelsValor, datasets: [{ label: '@T["Common.PurchaseValue"]', data: dadosValor, backgroundColor: [c.blue + '99', c.green + '99'], borderColor: [c.blue, c.green], borderWidth: 1 }] },
+                options: baseOptions()
+            });
+        }
+
+        renderCharts();
+        window.addEventListener('techasset:themechanged', renderCharts);
     </script>
 }
