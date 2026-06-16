@@ -48,6 +48,12 @@
 
         <div class="col-md-4">
             <button type="submit" class="btn btn-primary me-2">@filter</button>
+            <a asp-action="ExportarHistoricoTxt"
+               asp-route-searchString="@ViewData["CurrentFilter"]"
+               asp-route-tipoAcao="@ViewData["TipoAcaoFilter"]"
+               class="btn btn-outline-primary me-2">
+                @(T.IsEnglish ? "Export TXT" : "Exportar TXT")
+            </a>
             @if (ViewData["CurrentFilter"] != null || ViewData["TipoAcaoFilter"] != null)
             {
                 <a asp-action="Index" class="btn btn-outline-secondary">@clear</a>

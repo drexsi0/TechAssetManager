@@ -118,83 +118,143 @@ namespace GerenciadorAtivos.Controllers
             return File(pdf, "application/pdf", $"Relatorio_Ativos_{emitidoEm:yyyyMMdd_HHmm}.pdf");
         }
 
-        // A Mágica do Excel
         public async Task<IActionResult> ExportarAtivosExcel()
         {
-            // 1. Busca os dados no banco
             var ativos = await BuscarAtivosRelatorioAsync();
+            var emitidoEm = DateTime.Now;
+            var totalInvestido = ativos.Sum(a => a.ValorCompra);
+            var valorAtual = ativos.Sum(a => a.ValorAtual);
+            var depreciacao = totalInvestido - valorAtual;
 
-            // 2. Cria o arquivo Excel na memória
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.Worksheets.Add("Ativos");
+                var worksheet = workbook.Worksheets.Add("Inventario");
 
-                // 3. Cria o Cabeçalho (Adicionando colunas novas)
-                worksheet.Cell(1, 1).Value = "ID";
-                worksheet.Cell(1, 2).Value = "Nome";
-                worksheet.Cell(1, 3).Value = "Patrimônio";
-                worksheet.Cell(1, 4).Value = "Tipo";
-                worksheet.Cell(1, 5).Value = "Setor";
-                worksheet.Cell(1, 6).Value = "Status";
-                worksheet.Cell(1, 7).Value = "Marca/Modelo";
-                worksheet.Cell(1, 8).Value = "Responsável";
-                worksheet.Cell(1, 9).Value = "Data Compra";
-                worksheet.Cell(1, 10).Value = "Valor Pago";
-                worksheet.Cell(1, 11).Value = "Valor Atual";
+                worksheet.Cell("A1").Value = "TechAsset Manager";
+                worksheet.Cell("A2").Value = "Relatorio geral de ativos";
+                worksheet.Cell("A3").Value = $"Emitido em {emitidoEm:dd/MM/yyyy HH:mm}";
 
-                // Estiliza o cabeçalho
-                var header = worksheet.Range("A1:K1");
+                worksheet.Range("A1:K1").Merge().Style
+                    .Font.SetBold()
+                    .Font.SetFontSize(18)
+                    .Font.SetFontColor(XLColor.White)
+                    .Fill.SetBackgroundColor(XLColor.FromHtml("#0B5ED7"));
+
+                worksheet.Range("A2:K2").Merge().Style
+                    .Font.SetBold()
+                    .Font.SetFontSize(12)
+                    .Font.SetFontColor(XLColor.FromHtml("#172033"))
+                    .Fill.SetBackgroundColor(XLColor.FromHtml("#EAF2FF"));
+
+                worksheet.Range("A3:K3").Merge().Style
+                    .Font.SetFontColor(XLColor.FromHtml("#637083"))
+                    .Fill.SetBackgroundColor(XLColor.FromHtml("#EAF2FF"));
+
+                worksheet.Cell("A5").Value = "Total de ativos";
+                worksheet.Cell("B5").Value = ativos.Count;
+                worksheet.Cell("D5").Value = "Investimento total";
+                worksheet.Cell("E5").Value = totalInvestido;
+                worksheet.Cell("G5").Value = "Valor atual";
+                worksheet.Cell("H5").Value = valorAtual;
+                worksheet.Cell("J5").Value = "Depreciacao";
+                worksheet.Cell("K5").Value = depreciacao;
+
+                var summaryRange = worksheet.Range("A5:K5");
+                summaryRange.Style.Fill.BackgroundColor = XLColor.FromHtml("#F4F7FB");
+                summaryRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                summaryRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                summaryRange.Style.Border.OutsideBorderColor = XLColor.FromHtml("#D9E2EC");
+                summaryRange.Style.Border.InsideBorderColor = XLColor.FromHtml("#D9E2EC");
+                worksheet.Range("E5:E5").Style.NumberFormat.Format = "R$ #,##0.00";
+                worksheet.Range("H5:H5").Style.NumberFormat.Format = "R$ #,##0.00";
+                worksheet.Range("K5:K5").Style.NumberFormat.Format = "R$ #,##0.00";
+                worksheet.Range("A5,D5,G5,J5").Style.Font.Bold = true;
+
+                var headers = new[]
+                {
+                    "ID",
+                    "Nome",
+                    "Patrimonio",
+                    "Tipo",
+                    "Setor",
+                    "Status",
+                    "Marca/Modelo",
+                    "Responsavel",
+                    "Data Compra",
+                    "Valor Pago",
+                    "Valor Atual"
+                };
+
+                for (var i = 0; i < headers.Length; i++)
+                {
+                    worksheet.Cell(7, i + 1).Value = headers[i];
+                }
+
+                var header = worksheet.Range("A7:K7");
                 header.Style.Font.Bold = true;
-                header.Style.Fill.BackgroundColor = XLColor.LightGray;
+                header.Style.Font.FontColor = XLColor.White;
+                header.Style.Fill.BackgroundColor = XLColor.FromHtml("#0B5ED7");
+                header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                // 4. Preenche as linhas
-                int linha = 2;
+                int linha = 8;
                 foreach (var item in ativos)
                 {
                     worksheet.Cell(linha, 1).Value = item.Id;
                     worksheet.Cell(linha, 2).Value = item.Nome;
                     worksheet.Cell(linha, 3).Value = item.Patrimonio;
                     worksheet.Cell(linha, 4).Value = item.Tipo.ToString();
-
-                    // Lógica do Setor (mantém a que você já tem)
-                    if (Enum.TryParse(item.Setor, out SetorAtivo setorEnum))
-                    {
-                        worksheet.Cell(linha, 5).Value = setorEnum.ToString();
-                    }
-                    else
-                    {
-                        worksheet.Cell(linha, 5).Value = item.Setor;
-                    }
-
-                    worksheet.Cell(linha, 6).Value = item.Status.ToString();
+                    worksheet.Cell(linha, 5).Value = ObterSetor(item.Setor);
+                    worksheet.Cell(linha, 6).Value = item.Status?.ToString() ?? "Sem status";
                     worksheet.Cell(linha, 7).Value = $"{item.Marca} {item.Modelo}";
                     worksheet.Cell(linha, 8).Value = item.Responsavel?.Email ?? "Sem responsável";
-
                     worksheet.Cell(linha, 9).Value = item.DataCompra;
                     worksheet.Cell(linha, 10).Value = item.ValorCompra;
-                    worksheet.Cell(linha, 10).Style.NumberFormat.Format = "R$ #,##0.00";
-
                     worksheet.Cell(linha, 11).Value = item.ValorAtual;
+
+                    worksheet.Cell(linha, 9).Style.DateFormat.Format = "dd/MM/yyyy";
+                    worksheet.Cell(linha, 10).Style.NumberFormat.Format = "R$ #,##0.00";
                     worksheet.Cell(linha, 11).Style.NumberFormat.Format = "R$ #,##0.00";
 
-                    // Pinta status Manutenção (mantém sua lógica)
+                    var row = worksheet.Range(linha, 1, linha, 11);
+                    row.Style.Fill.BackgroundColor = linha % 2 == 0 ? XLColor.White : XLColor.FromHtml("#F8FAFC");
+
                     if (item.Status == StatusAtivo.Manutencao)
                     {
-                        worksheet.Cell(linha, 6).Style.Font.FontColor = XLColor.Red;
+                        worksheet.Cell(linha, 6).Style.Font.FontColor = XLColor.FromHtml("#B45309");
+                        worksheet.Cell(linha, 6).Style.Font.Bold = true;
+                    }
+                    else if (item.Status == StatusAtivo.Disponivel)
+                    {
+                        worksheet.Cell(linha, 6).Style.Font.FontColor = XLColor.FromHtml("#198754");
+                        worksheet.Cell(linha, 6).Style.Font.Bold = true;
+                    }
+                    else if (item.Status == StatusAtivo.Descartado)
+                    {
+                        worksheet.Cell(linha, 6).Style.Font.FontColor = XLColor.FromHtml("#DC3545");
+                        worksheet.Cell(linha, 6).Style.Font.Bold = true;
                     }
 
                     linha++;
                 }
 
-                // Ajusta a largura das colunas automaticamente
-                worksheet.Columns().AdjustToContents();
+                var tableRange = worksheet.Range(7, 1, Math.Max(linha - 1, 7), 11);
+                tableRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                tableRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                tableRange.Style.Border.OutsideBorderColor = XLColor.FromHtml("#D9E2EC");
+                tableRange.Style.Border.InsideBorderColor = XLColor.FromHtml("#D9E2EC");
+                tableRange.SetAutoFilter();
 
-                // 5. Prepara o download
+                worksheet.SheetView.FreezeRows(7);
+                worksheet.Columns().AdjustToContents();
+                worksheet.Columns(1, 11).Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+                worksheet.Column(2).Width = Math.Max(worksheet.Column(2).Width, 24);
+                worksheet.Column(8).Width = Math.Max(worksheet.Column(8).Width, 28);
+
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
                     var content = stream.ToArray();
-                    string fileName = $"Relatorio_Ativos_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+                    string fileName = $"Relatorio_Ativos_{emitidoEm:yyyyMMdd_HHmm}.xlsx";
 
                     return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
                 }
