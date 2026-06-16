@@ -19,15 +19,15 @@
     <div class="alert alert-success">@statusMessage</div>
 }
 
-<div class="app-card">
+<div class="app-card table-card">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0 users-table">
             <thead class="thead-azul">
                 <tr>
                     <th>E-mail</th>
                     <th>@(T.IsEnglish ? "Current role" : "Perfil atual")</th>
                     <th>@(T.IsEnglish ? "New role" : "Novo perfil")</th>
-                    <th class="text-end">@(T.IsEnglish ? "Action" : "Ação")</th>
+                    <th class="text-end">@(T.IsEnglish ? "Actions" : "Ações")</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,9 +37,9 @@
                         <td>@usuario.Email</td>
                         <td><span class="badge bg-primary">@usuario.CurrentRole</span></td>
                         <td>
-                            <form id="role-form-@usuario.UserId" asp-action="UpdateRole" method="post" class="d-flex gap-2 justify-content-end">
+                            <form id="role-form-@usuario.UserId" asp-action="UpdateRole" method="post" class="user-role-form">
                                 <input type="hidden" name="userId" value="@usuario.UserId" />
-                                <select name="selectedRole" class="form-select form-select-sm w-auto">
+                                <select name="selectedRole" class="form-select form-select-sm">
                                     @foreach (var role in (IEnumerable<SelectListItem>)ViewBag.Roles)
                                     {
                                         <option value="@role.Value" selected="@(role.Value == usuario.SelectedRole)">@role.Text</option>
@@ -48,7 +48,13 @@
                             </form>
                         </td>
                         <td class="text-end">
-                            <button type="submit" form="role-form-@usuario.UserId" class="btn btn-sm btn-outline-primary">@(T.IsEnglish ? "Save" : "Salvar")</button>
+                            <div class="user-actions">
+                                <button type="submit" form="role-form-@usuario.UserId" class="btn btn-sm btn-outline-primary">@(T.IsEnglish ? "Save" : "Salvar")</button>
+                                <form asp-action="DeleteUser" method="post" class="m-0" onsubmit="return confirm('@(T.IsEnglish ? "Delete this user?" : "Excluir este usuário?")');">
+                                    <input type="hidden" name="userId" value="@usuario.UserId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@(T.IsEnglish ? "Delete" : "Excluir")</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

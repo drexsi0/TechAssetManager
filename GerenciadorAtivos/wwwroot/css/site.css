@@ -206,6 +206,22 @@ body {
 .detail-list dt { color: var(--app-muted); font-weight: 700; }
 .detail-list dd { margin: 0; color: var(--app-text); }
 
+.users-table th:nth-child(3),
+.users-table td:nth-child(3) {
+  text-align: left;
+}
+
+.user-role-form {
+  max-width: 140px;
+}
+
+.user-actions {
+  display: inline-flex;
+  gap: .5rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 .privacy-section { max-width: 980px; margin: 0 auto; }
 .privacy-section h2 { font-size: 1.15rem; margin-top: 1.5rem; }
 

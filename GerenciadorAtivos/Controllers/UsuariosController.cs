@@ -1,3 +1,4 @@
+using GerenciadorAtivos.Data;
 using GerenciadorAtivos.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,11 +15,13 @@ namespace GerenciadorAtivos.Controllers
 
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
-        public UsuariosController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UsuariosController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -59,12 +62,18 @@ namespace GerenciadorAtivos.Controllers
                 return NotFound();
             }
 
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            if (currentRoles.Contains("Admin") && selectedRole != "Admin" && await EhUltimoAdminAsync(user.Id))
+            {
+                TempData["StatusMessage"] = "Nao e permitido remover o perfil do ultimo administrador.";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (!await _roleManager.RoleExistsAsync(selectedRole))
             {
                 await _roleManager.CreateAsync(new IdentityRole(selectedRole));
             }
 
-            var currentRoles = await _userManager.GetRolesAsync(user);
             if (currentRoles.Any())
             {
                 await _userManager.RemoveFromRolesAsync(user, currentRoles);
@@ -73,6 +82,57 @@ namespace GerenciadorAtivos.Controllers
             await _userManager.AddToRoleAsync(user, selectedRole);
             TempData["StatusMessage"] = $"Perfil de {user.Email} atualizado para {selectedRole}.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            if (userId == currentUserId)
+            {
+                TempData["StatusMessage"] = "Nao e permitido excluir a propria conta logada.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                TempData["StatusMessage"] = "Usuario nao encontrado.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "Admin") && await EhUltimoAdminAsync(user.Id))
+            {
+                TempData["StatusMessage"] = "Nao e permitido excluir o ultimo administrador do sistema.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var ativosDoUsuario = await _context.Ativos
+                .Where(a => a.ResponsavelId == userId)
+                .ToListAsync();
+
+            foreach (var ativo in ativosDoUsuario)
+            {
+                ativo.ResponsavelId = null;
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                TempData["StatusMessage"] = "Nao foi possivel excluir o usuario.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["StatusMessage"] = $"Usuario {user.Email} excluido com sucesso.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<bool> EhUltimoAdminAsync(string userId)
+        {
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            return admins.Count == 1 && admins[0].Id == userId;
         }
     }
 }
