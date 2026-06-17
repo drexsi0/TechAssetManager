@@ -172,7 +172,7 @@ body {
 }
 
 .nav-divider-list .nav-item + .nav-item {
-  border-left: 1px solid rgba(255, 255, 255, .35);
+  border-left: 2px solid rgba(255, 255, 255, .42);
 }
 
 .nav-divider-list .nav-link {
