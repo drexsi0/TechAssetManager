@@ -62,31 +62,32 @@
                 <button class="btn btn-outline-secondary inventory-filter-button" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados" aria-expanded="false">
                     <i class="bi bi-funnel me-1"></i>@(T.IsEnglish ? "Advanced filters" : "Filtros avançados")
                 </button>
+            </div>
         </div>
 
-        <div class="collapse mt-3 @(hasFilters ? "show" : "")" id="filtrosAvancados">
+        <div class="collapse @(hasFilters ? "show" : "")" id="filtrosAvancados">
             <div class="filter-panel">
-                <div class="row g-3">
-                    <div class="col-md-3">
+                <div class="advanced-filter-grid">
+                    <div>
                         <label class="form-label">@T["Common.Status"]</label>
                         <select name="statusFilter" class="form-select" asp-items="statusList">
                             <option value="">@(T.IsEnglish ? "All" : "Todos")</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div>
                         <label class="form-label">@T["Common.Sector"]</label>
                         <select name="setorFilter" class="form-select" asp-items="setorList">
                             <option value="">@(T.IsEnglish ? "All" : "Todos")</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div>
                         <label class="form-label">@T["Common.Type"]</label>
                         <select name="tipoFilter" class="form-select" asp-items="tipoList">
                             <option value="">@(T.IsEnglish ? "All" : "Todos")</option>
                         </select>
                     </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">@(T.IsEnglish ? "Apply filters" : "Aplicar filtros")</button>
+                    <div>
+                        <button type="submit" class="btn btn-primary">@(T.IsEnglish ? "Apply filters" : "Aplicar filtros")</button>
                     </div>
                 </div>
             </div>

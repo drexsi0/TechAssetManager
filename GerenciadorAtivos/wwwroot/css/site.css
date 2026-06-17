@@ -148,7 +148,27 @@ body {
   border: 1px solid var(--app-border);
   border-radius: 8px;
   background: var(--app-surface-muted);
-  padding: 1rem;
+  padding: .85rem;
+  margin: .65rem 0 0 auto;
+  max-width: 520px;
+}
+
+.advanced-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(90px, 1fr)) auto;
+  gap: .75rem;
+  align-items: end;
+}
+
+.advanced-filter-grid .form-label {
+  margin-bottom: .35rem;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+.advanced-filter-grid .form-select,
+.advanced-filter-grid .btn {
+  min-height: 38px;
 }
 
 .filter-card { padding: .45rem; }
@@ -233,6 +253,8 @@ body {
   .detail-list { grid-template-columns: 1fr; }
   .inventory-toolbar { flex-direction: column; }
   .inventory-filter-button { width: 100%; }
+  .filter-panel { max-width: none; }
+  .advanced-filter-grid { grid-template-columns: 1fr; }
   .nav-divider-list .nav-item + .nav-item { border-left: 0; }
 }
 
