@@ -2,7 +2,7 @@
 
 Sistema web para gerenciamento de inventário de ativos de TI, desenvolvido em ASP.NET Core MVC como projeto principal de portfólio. A aplicação cobre autenticação, autorização por perfis, rastreabilidade, cadastro de ativos, dashboard operacional, relatórios e deploy containerizado.
 
-![Status](https://img.shields.io/badge/status-portfolio%20ready-blue) ![.NET](https://img.shields.io/badge/.NET-10%20Preview-purple) ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-MVC-512bd4)
+![Status](https://img.shields.io/badge/status-portfolio%20ready-blue) ![.NET](https://img.shields.io/badge/.NET-10%20LTS-purple) ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-MVC-512bd4)
 
 ## Demo
 
@@ -11,6 +11,12 @@ A aplicação está disponível em produção:
 https://techassetmanager.onrender.com/
 
 Para avaliação técnica, este README apresenta stack, funcionalidades, decisões de arquitetura, segurança e screenshots reais do sistema.
+
+### Como acessar a demo
+
+A demo pública permite criação de conta para avaliação. No ambiente de demonstração, o cadastro é auto-confirmado para facilitar o teste do fluxo principal sem expor credenciais administrativas.
+
+Após o cadastro, é possível acessar o dashboard, inventário, relatórios, auditoria e demais telas disponíveis ao perfil criado.
 
 ## Screenshots
 
