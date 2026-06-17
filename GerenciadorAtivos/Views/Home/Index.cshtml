@@ -20,6 +20,12 @@
     var depreciacao = Model.ValorTotalInvestido - Model.ValorTotalAtual;
     var taxaUso = Model.TotalAtivos == 0 ? 0 : Math.Round((decimal)Model.EmUso / Model.TotalAtivos * 100, 1);
     var taxaDisponibilidade = Model.TotalAtivos == 0 ? 0 : Math.Round((decimal)Model.Disponiveis / Model.TotalAtivos * 100, 1);
+    var idsStatus = Model.AtivosPorStatus.Keys
+        .Select(status => Enum.TryParse<GerenciadorAtivos.Models.StatusAtivo>(status, out var statusEnum) ? ((int)statusEnum).ToString() : "")
+        .ToList();
+    var idsTipo = Model.AtivosPorTipo.Keys
+        .Select(tipo => Enum.TryParse<GerenciadorAtivos.Models.TipoAtivo>(tipo, out var tipoEnum) ? ((int)tipoEnum).ToString() : "")
+        .ToList();
 }
 
 <section class="dashboard-hero">
@@ -132,7 +138,9 @@
         const dataSetor = @Html.Raw(Json.Serialize(dataSetor));
         const idsSetor = @Html.Raw(Json.Serialize(idsSetor));
         const dadosStatus = @Html.Raw(Json.Serialize(Model.AtivosPorStatus));
+        const idsStatus = @Html.Raw(Json.Serialize(idsStatus));
         const dadosTipo = @Html.Raw(Json.Serialize(Model.AtivosPorTipo));
+        const idsTipo = @Html.Raw(Json.Serialize(idsTipo));
         const dadosValor = @Html.Raw(Json.Serialize(new[] { Model.ValorTotalInvestido, Model.ValorTotalAtual }));
         const labelsValor = @Html.Raw(Json.Serialize(new[] { T["Common.Invested"], T["Common.Current"] }));
 
@@ -176,13 +184,22 @@
             chartStatus = new Chart(document.getElementById('graficoStatus'), {
                 type: 'doughnut',
                 data: { labels: Object.keys(dadosStatus), datasets: [{ data: Object.values(dadosStatus), backgroundColor: [c.green, c.blue, c.yellow, c.red] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: c.text } } } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: c.text } } },
+                    onClick: (_, active) => {
+                        if (active.length && idsStatus[active[0].index] !== '') {
+                            window.location.href = '/Ativos?statusFilter=' + encodeURIComponent(idsStatus[active[0].index]);
+                        }
+                    }
+                }
             });
 
             chartTipo = new Chart(document.getElementById('graficoTipo'), {
                 type: 'bar',
                 data: { labels: Object.keys(dadosTipo), datasets: [{ label: '@T["Common.Total"]', data: Object.values(dadosTipo), backgroundColor: c.green + '99', borderColor: c.green, borderWidth: 1 }] },
-                options: baseOptions()
+                options: { ...baseOptions(), onClick: (_, active) => { if (active.length) window.location.href = '/Ativos?tipoFilter=' + encodeURIComponent(idsTipo[active[0].index]); } }
             });
 
             chartValor = new Chart(document.getElementById('graficoValor'), {
