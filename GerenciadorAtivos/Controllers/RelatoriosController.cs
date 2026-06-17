@@ -168,7 +168,10 @@ namespace GerenciadorAtivos.Controllers
                 worksheet.Range("E5:E5").Style.NumberFormat.Format = "R$ #,##0.00";
                 worksheet.Range("H5:H5").Style.NumberFormat.Format = "R$ #,##0.00";
                 worksheet.Range("K5:K5").Style.NumberFormat.Format = "R$ #,##0.00";
-                worksheet.Range("A5,D5,G5,J5").Style.Font.Bold = true;
+                foreach (var cellAddress in new[] { "A5", "D5", "G5", "J5" })
+                {
+                    worksheet.Cell(cellAddress).Style.Font.Bold = true;
+                }
 
                 var headers = new[]
                 {
