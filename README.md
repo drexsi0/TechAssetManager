@@ -4,7 +4,13 @@ Sistema web para gerenciamento de inventário de ativos de TI, desenvolvido em A
 
 ![Status](https://img.shields.io/badge/status-portfolio%20ready-blue) ![.NET](https://img.shields.io/badge/.NET-10%20Preview-purple) ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-MVC-512bd4)
 
-**Demo em produção:** https://techassetmanager.onrender.com/
+## Demo
+
+A aplicação está disponível em produção:
+
+https://techassetmanager.onrender.com/
+
+Para avaliação técnica, este README apresenta stack, funcionalidades, decisões de arquitetura, segurança e screenshots reais do sistema.
 
 ## Screenshots
 
@@ -92,25 +98,6 @@ Notas importantes:
 - O seed de administrador só roda se `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` estiverem configurados.
 - O login aplica lockout após falhas, cookies HttpOnly/SameSite e headers básicos de segurança.
 - Depois de qualquer segredo exposto, rotacione a credencial no provedor externo antes de publicar o repositório.
-
-## Como Rodar Localmente
-
-1. Clone o repositório.
-2. Configure a connection string e SMTP via User Secrets ou variáveis de ambiente.
-3. Restaure e compile:
-
-```bash
-dotnet restore GerenciadorAtivosSolution.slnx
-dotnet build GerenciadorAtivosSolution.slnx
-```
-
-4. Execute a aplicação:
-
-```bash
-dotnet run --project GerenciadorAtivos/GerenciadorAtivos.csproj
-```
-
-5. Acesse a URL exibida pelo ASP.NET Core.
 
 ## Testes e Auditoria
 
