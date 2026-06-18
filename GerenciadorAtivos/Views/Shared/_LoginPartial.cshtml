@@ -1,15 +1,16 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using GerenciadorAtivos.Services
 @inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
 @inject IUiTextService T
+@inject IUserDisplayService UserDisplay
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
+        var displayName = await UserDisplay.GetHeaderDisplayNameAsync(User);
         <li class="nav-item">
             <a id="manage" class="nav-link text-white" asp-area="Identity" asp-page="/Account/Manage/Index" title="@(T.IsEnglish ? "Manage account" : "Gerenciar conta")">
-                @(T.IsEnglish ? "Hello" : "Olá"), <b>@UserManager.GetUserName(User)</b>!
+                @(T.IsEnglish ? "Hello" : "Olá"), <b>@displayName</b>!
             </a>
         </li>
         <li class="nav-item">

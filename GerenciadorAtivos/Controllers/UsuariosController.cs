@@ -1,5 +1,6 @@
 using GerenciadorAtivos.Data;
 using GerenciadorAtivos.Models.ViewModels;
+using GerenciadorAtivos.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,14 @@ namespace GerenciadorAtivos.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
+        private readonly IUserDisplayService _userDisplayService;
 
-        public UsuariosController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
+        public UsuariosController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context, IUserDisplayService userDisplayService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
+            _userDisplayService = userDisplayService;
         }
 
         public async Task<IActionResult> Index()
@@ -38,6 +41,8 @@ namespace GerenciadorAtivos.Controllers
                 {
                     UserId = user.Id,
                     Email = user.Email ?? user.UserName ?? user.Id,
+                    DisplayEmail = _userDisplayService.GetUserListEmail(user, roles),
+                    DisplayName = _userDisplayService.GetUserDisplayName(user, roles),
                     CurrentRole = roles.FirstOrDefault() ?? "User",
                     SelectedRole = roles.FirstOrDefault() ?? "User"
                 });
@@ -80,7 +85,7 @@ namespace GerenciadorAtivos.Controllers
             }
 
             await _userManager.AddToRoleAsync(user, selectedRole);
-            TempData["StatusMessage"] = $"Perfil de {user.Email} atualizado para {selectedRole}.";
+            TempData["StatusMessage"] = $"Perfil de {_userDisplayService.GetUserDisplayName(user, currentRoles)} atualizado para {selectedRole}.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -117,6 +122,7 @@ namespace GerenciadorAtivos.Controllers
                 ativo.ResponsavelId = null;
             }
 
+            var displayName = _userDisplayService.GetUserDisplayName(user, await _userManager.GetRolesAsync(user));
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
@@ -125,7 +131,7 @@ namespace GerenciadorAtivos.Controllers
             }
 
             await _context.SaveChangesAsync();
-            TempData["StatusMessage"] = $"Usuario {user.Email} excluido com sucesso.";
+            TempData["StatusMessage"] = $"Usuario {displayName} excluido com sucesso.";
             return RedirectToAction(nameof(Index));
         }
 

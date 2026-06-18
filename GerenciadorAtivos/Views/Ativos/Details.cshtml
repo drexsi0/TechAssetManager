@@ -1,5 +1,7 @@
 @model GerenciadorAtivos.Models.Ativo
+@using GerenciadorAtivos.Services
 @inject IUiTextService T
+@inject IUserDisplayService UserDisplay
 
 @{
     ViewData["Title"] = T.IsEnglish ? "Asset details" : "Detalhes do ativo";
@@ -41,7 +43,16 @@
             <dt>@T["Common.Status"]</dt>
             <dd>@Html.DisplayFor(model => model.Status)</dd>
             <dt>@T["Common.Responsible"]</dt>
-            <dd>@(Model.Responsavel?.Email ?? T["Common.NoResponsible"])</dd>
+            <dd>
+                @if (Model.Responsavel?.Email != null)
+                {
+                    @await UserDisplay.GetAuditUserDisplayNameAsync(Model.Responsavel.Email)
+                }
+                else
+                {
+                    @T["Common.NoResponsible"]
+                }
+            </dd>
         </dl>
     </section>
 
@@ -77,7 +88,7 @@
                         {
                             <tr>
                                 <td>@item.DataAcao.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>@(string.IsNullOrEmpty(item.Usuario) ? "Sistema" : item.Usuario)</td>
+                                <td>@await UserDisplay.GetAuditUserDisplayNameAsync(item.Usuario)</td>
                                 <td><span class="badge bg-secondary">@item.TipoAcao</span></td>
                                 <td>@item.Descricao</td>
                             </tr>

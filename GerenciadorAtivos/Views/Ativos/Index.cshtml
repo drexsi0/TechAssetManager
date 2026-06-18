@@ -1,6 +1,8 @@
 @using X.PagedList
 @using X.PagedList.Mvc.Core
+@using GerenciadorAtivos.Services
 @inject IUiTextService T
+@inject IUserDisplayService UserDisplay
 @model IPagedList<GerenciadorAtivos.Models.Ativo>
 
 @{
@@ -124,7 +126,16 @@
                             }
                             @setorTexto
                         </td>
-                        <td>@(item.Responsavel?.Email ?? T["Common.NoResponsible"])</td>
+                        <td>
+                            @if (item.Responsavel?.Email != null)
+                            {
+                                @await UserDisplay.GetAuditUserDisplayNameAsync(item.Responsavel.Email)
+                            }
+                            else
+                            {
+                                @T["Common.NoResponsible"]
+                            }
+                        </td>
                         <td>
                             @{
                                 string corBadge = "bg-secondary";

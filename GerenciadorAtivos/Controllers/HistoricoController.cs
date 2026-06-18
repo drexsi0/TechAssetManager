@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GerenciadorAtivos.Data;
+using GerenciadorAtivos.Models;
+using GerenciadorAtivos.Models.ViewModels;
+using GerenciadorAtivos.Services;
 using X.PagedList;
 using Microsoft.AspNetCore.Authorization;
 using System.Text;
@@ -11,10 +14,12 @@ namespace GerenciadorAtivos.Controllers
     public class HistoricoController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUserDisplayService _userDisplayService;
 
-        public HistoricoController(ApplicationDbContext context)
+        public HistoricoController(ApplicationDbContext context, IUserDisplayService userDisplayService)
         {
             _context = context;
+            _userDisplayService = userDisplayService;
         }
 
         public async Task<IActionResult> Index(int? pageNumber, string searchString, string tipoAcao)
@@ -36,7 +41,8 @@ namespace GerenciadorAtivos.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            var listaPaginada = new StaticPagedList<GerenciadorAtivos.Models.Historico>(items, pageIndex, pageSize, totalItemCount);
+            var viewItems = await MapearHistoricosAsync(items);
+            var listaPaginada = new StaticPagedList<HistoricoViewModel>(viewItems, pageIndex, pageSize, totalItemCount);
 
             return View(listaPaginada);
         }
@@ -57,8 +63,9 @@ namespace GerenciadorAtivos.Controllers
 
             foreach (var item in registros)
             {
+                var usuarioDisplay = await _userDisplayService.GetAuditUserDisplayNameAsync(item.Usuario);
                 builder.AppendLine($"Data/Hora: {item.DataAcao:dd/MM/yyyy HH:mm}");
-                builder.AppendLine($"Usuario: {item.Usuario ?? "Sistema"}");
+                builder.AppendLine($"Usuario: {usuarioDisplay}");
                 builder.AppendLine($"Acao: {item.TipoAcao}");
                 builder.AppendLine($"Ativo: {(item.Ativo == null ? "Ativo excluido" : $"{item.Ativo.Nome} ({item.Ativo.Patrimonio})")}");
                 builder.AppendLine($"Detalhes: {item.Descricao}");
@@ -89,6 +96,28 @@ namespace GerenciadorAtivos.Controllers
             }
 
             return query;
+        }
+
+        private async Task<List<HistoricoViewModel>> MapearHistoricosAsync(IEnumerable<Historico> historicos)
+        {
+            var resultado = new List<HistoricoViewModel>();
+
+            foreach (var historico in historicos)
+            {
+                resultado.Add(new HistoricoViewModel
+                {
+                    Id = historico.Id,
+                    AtivoId = historico.AtivoId,
+                    Ativo = historico.Ativo,
+                    DataAcao = historico.DataAcao,
+                    TipoAcao = historico.TipoAcao,
+                    Descricao = historico.Descricao,
+                    Usuario = historico.Usuario,
+                    UsuarioDisplay = await _userDisplayService.GetAuditUserDisplayNameAsync(historico.Usuario)
+                });
+            }
+
+            return resultado;
         }
     }
 }

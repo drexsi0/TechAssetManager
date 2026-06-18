@@ -34,7 +34,14 @@
                 @foreach (var usuario in Model)
                 {
                     <tr>
-                        <td>@usuario.Email</td>
+                        <td>
+                            <span class="fw-semibold">@usuario.DisplayEmail</span>
+                            @if (!string.IsNullOrWhiteSpace(usuario.DisplayName) && usuario.DisplayName != usuario.DisplayEmail)
+                            {
+                                <br />
+                                <small class="text-muted">@usuario.DisplayName</small>
+                            }
+                        </td>
                         <td><span class="badge bg-primary">@usuario.CurrentRole</span></td>
                         <td>
                             <form id="role-form-@usuario.UserId" asp-action="UpdateRole" method="post" class="user-role-form">

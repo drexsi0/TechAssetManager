@@ -45,6 +45,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IUiTextService, UiTextService>();
+builder.Services.AddScoped<IUserDisplayService, UserDisplayService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddLocalization();

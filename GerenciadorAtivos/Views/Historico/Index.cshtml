@@ -1,6 +1,6 @@
 ﻿@using X.PagedList
 @using X.PagedList.Mvc.Core
-@model IPagedList<GerenciadorAtivos.Models.Historico>
+@model IPagedList<GerenciadorAtivos.Models.ViewModels.HistoricoViewModel>
 @inject IUiTextService T
 
 @{
@@ -79,7 +79,7 @@
                 {
                     <tr>
                         <td style="white-space: nowrap;">@item.DataAcao.ToString("g")</td>
-                        <td><i class="bi bi-person-circle fs-5 me-2 text-secondary"></i>@item.Usuario</td>
+                        <td><i class="bi bi-person-circle fs-5 me-2 text-secondary"></i>@item.UsuarioDisplay</td>
                         <td><span class="badge bg-secondary rounded-pill">@item.TipoAcao</span></td>
                         <td>
                             @if (item.Ativo != null)
